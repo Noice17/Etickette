@@ -23,8 +23,9 @@ public class DataInitializer {
     }
 
     @Bean
-    public CommandLineRunner initData(){
-        return args ->{
+    public CommandLineRunner initData() {
+        return args -> {
+            if (userRepository.count() == 0) {
                 //Create User
                 User admin = new User();
                 admin.setUsername("Admin");
@@ -44,6 +45,7 @@ public class DataInitializer {
                 client.setUpdatedAt(LocalDateTime.now());
                 userRepository.save(client);
 
-            };
+            } ;
         };
     }
+}
