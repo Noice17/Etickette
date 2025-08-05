@@ -1,9 +1,23 @@
-import Image from "next/image";
+
+"use client";
+
+
 import { Clock, FileChartColumnIcon, Star, Ticket } from "lucide-react";
 import ResolutionTimeChart from "../components/ResolutionTimeChart";
 import PriorityTicketChart from "../components/PriorityTicketChart";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.replace("/login");
+    }
+  }, []);
+
   return (
     <div className="p-6 space-y-6">
       {/* Hero Banner */}

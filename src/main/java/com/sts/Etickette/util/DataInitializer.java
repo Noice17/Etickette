@@ -26,23 +26,23 @@ public class DataInitializer {
     public CommandLineRunner initData(){
         return args ->{
                 //Create User
-                User admin = new User();
-                admin.setUsername("Admin");
-                admin.setEmail("admin@email.com");
-                admin.setPassword(passwordEncoder.encode("password"));
-                admin.setRole(User.UserRole.ADMIN);
-                admin.setCreatedAt(LocalDateTime.now());
-                admin.setUpdatedAt(LocalDateTime.now());
-                userRepository.save(admin);
-
-                User client = new User();
-                client.setUsername("Client");
-                client.setEmail("client@email.com");
-                client.setPassword(passwordEncoder.encode("password"));
-                client.setRole(User.UserRole.CLIENT);
-                client.setCreatedAt(LocalDateTime.now());
-                client.setUpdatedAt(LocalDateTime.now());
-                userRepository.save(client);
+//                User admin = new User();
+//                admin.setUsername("Admin");
+//                admin.setEmail("admin@email.com");
+//                admin.setPassword(passwordEncoder.encode("password"));
+//                admin.setRole(User.UserRole.ADMIN);
+//                admin.setCreatedAt(LocalDateTime.now());
+//                admin.setUpdatedAt(LocalDateTime.now());
+//                userRepository.save(admin);
+//
+//                User client = new User();
+//                client.setUsername("Client");
+//                client.setEmail("client@email.com");
+//                client.setPassword(passwordEncoder.encode("password"));
+//                client.setRole(User.UserRole.CLIENT);
+//                client.setCreatedAt(LocalDateTime.now());
+//                client.setUpdatedAt(LocalDateTime.now());
+//                userRepository.save(client);
 
             };
         };

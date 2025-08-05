@@ -10,6 +10,7 @@ import {
   Users,
   LogOut,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Props = {
   collapsed: boolean;
@@ -17,6 +18,18 @@ type Props = {
 };
 
 export default function Sidebar({ collapsed, toggleCollapsed }: Props) {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("auth"); // if you're still storing this
+    document.cookie = "token=; Max-Age=0; path=/"; // clear cookie if you're using one
+
+    // Redirect to login
+    router.push("/login");
+  };
+
   return (
     <aside
       className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-indigo-600 shadow transition-all duration-300 ${
@@ -65,10 +78,13 @@ export default function Sidebar({ collapsed, toggleCollapsed }: Props) {
       {/* Bottom section: Logout */}
       <div className="bg-indigo-800">
         <Link href="/login">
-          <div className="flex items-center gap-2 px-5 py-3 hover:bg-indigo-700 rounded">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-5 py-3 hover:bg-indigo-700 rounded w-full text-left"
+          >
             <LogOut />
             {!collapsed && <span>Logout</span>}
-          </div>
+          </button>
         </Link>
       </div>
     </aside>
