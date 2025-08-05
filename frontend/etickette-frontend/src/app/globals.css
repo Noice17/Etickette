@@ -10,12 +10,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-indigo-800: #1b1832;
+  --color-indigo-700: #231e41;
+  --color-indigo-600: #2e2b47;
+  --color-azure-300: #d2e0f7;
+  --color-azure-500: #24b7ff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #231e41;
+    --foreground: #d2e0f7;
   }
 }
 
