@@ -77,7 +77,10 @@ public class AuthController {
             throw new EmailAlreadyExistsException(errorMessage);
         }
 
-        userDTO.setRole(User.UserRole.CLIENT);
+        if (userDTO.getRole() == null) {
+            userDTO.setRole(User.UserRole.CLIENT);
+        }
+
         UserDTO created = userService.createUser(userDTO);
 
         Map<String, Object> response = new HashMap<>();

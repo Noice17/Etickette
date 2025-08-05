@@ -3,6 +3,7 @@ package com.sts.Etickette.service.implementation;
 import com.sts.Etickette.dto.UserDTO;
 import com.sts.Etickette.entity.User;
 import com.sts.Etickette.exception.EmailAlreadyExistsException;
+import com.sts.Etickette.exception.UserNotFoundException;
 import com.sts.Etickette.mapper.UserMapper;
 import com.sts.Etickette.repository.UserRepository;
 import com.sts.Etickette.service.UserService;
@@ -61,8 +62,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("error.user.not_found")
-//                        new UserNotFoundException(messageUtil.getMessage("error.user.not_found", id))
+                        new UserNotFoundException(messageUtil.getMessage("error.user.not_found", id))
                 );
         if(userDTO.getUsername() != null) user.setUsername(userDTO.getUsername());
         if(userDTO.getEmail() != null) user.setEmail(userDTO.getEmail());
@@ -94,9 +94,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         if(!userRepository.existsById(id)){
-            throw new RuntimeException("error.user.not_found");
-//            throw new UserNotFoundException(messageUtil.getMessage("error.user.not_found",id));
+            throw new UserNotFoundException(messageUtil.getMessage("error.user.not_found",id));
         }
+        userRepository.deleteById(id);
     }
 
     @Override

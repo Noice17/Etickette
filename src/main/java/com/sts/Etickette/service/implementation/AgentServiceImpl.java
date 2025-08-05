@@ -36,4 +36,30 @@ public class AgentServiceImpl implements AgentService {
         Agent updated = agentRepository.save(agent);
         return AgentMapper.toDTO(updated);
     }
+    @Override
+    public AgentDTO incrementWorkload(Long agentId) {
+        Agent agent = agentRepository.findById(agentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Agent not found with ID: " + agentId));
+
+        if (agent.getCurrentWorkload() >= agent.getMaxWorkload()) {
+            throw new IllegalStateException("Agent has reached maximum workload.");
+        }
+
+        agent.setCurrentWorkload(agent.getCurrentWorkload() + 1);
+        return AgentMapper.toDTO(agentRepository.save(agent));
+    }
+
+    @Override
+    public AgentDTO decrementWorkload(Long agentId) {
+        Agent agent = agentRepository.findById(agentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Agent not found with ID: " + agentId));
+
+        if (agent.getCurrentWorkload() <= 0) {
+            throw new IllegalStateException("Agent's workload is already zero.");
+        }
+
+        agent.setCurrentWorkload(agent.getCurrentWorkload() - 1);
+        return AgentMapper.toDTO(agentRepository.save(agent));
+    }
+
 }
