@@ -64,7 +64,7 @@ export default function Sidebar({ collapsed, toggleCollapsed }: Props) {
 
       {/* Bottom section: Logout */}
       <div className="bg-indigo-800">
-        <Link href="/auth/login">
+        <Link href="/login">
           <div className="flex items-center gap-2 px-5 py-3 hover:bg-indigo-700 rounded">
             <LogOut />
             {!collapsed && <span>Logout</span>}

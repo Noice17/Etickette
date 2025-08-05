@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -18,7 +19,6 @@ export default function LoginPage() {
   };
 
   const handleLogin = () => {
-    // Simple redirect to main page without any authentication logic
     router.push("/");
   };
 
@@ -28,7 +28,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Etickette</h2>
-          <p className="text-gray-600">Sign in to your ticketing system</p>
+          <p className="text-gray-600">Login to the #1 Ticketing System</p>
         </div>
 
         {/* Login Form */}
@@ -66,26 +66,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Remember Me */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Remember me
-                </label>
-              </div>
-              <button
-                type="button"
-                className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
-              >
-                Forgot password?
-              </button>
-            </div>
 
             {/* Login Button */}
             <button
@@ -93,7 +73,7 @@ export default function LoginPage() {
               onClick={handleLogin}
               className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
             >
-              Sign in
+              Log in
             </button>
           </div>
 
@@ -101,9 +81,9 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
-              <button className="text-indigo-600 hover:text-indigo-500 font-medium">
-                Contact your administrator
-              </button>
+              <Link href="/register" className="text-indigo-500 hover:text-indigo-300 font-medium hover:underline">
+                Register
+              </Link>
             </p>
           </div>
         </div>
