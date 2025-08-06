@@ -1,6 +1,4 @@
-package com.sts.Etickette.dto;
-
-import com.sts.Etickette.entity.User;
+package com.sts.Etickette.DTO;
 
 public class AgentDTO {
     private Long id;

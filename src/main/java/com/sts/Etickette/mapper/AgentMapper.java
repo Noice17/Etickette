@@ -1,6 +1,6 @@
 package com.sts.Etickette.mapper;
 
-import com.sts.Etickette.dto.AgentDTO;
+import com.sts.Etickette.DTO.AgentDTO;
 import com.sts.Etickette.entity.Agent;
 import com.sts.Etickette.entity.User;
 

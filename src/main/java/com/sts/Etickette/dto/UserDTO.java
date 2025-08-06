@@ -1,4 +1,4 @@
-package com.sts.Etickette.dto;
+package com.sts.Etickette.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sts.Etickette.entity.User;

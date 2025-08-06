@@ -1,6 +1,6 @@
 package com.sts.Etickette.service;
 
-import com.sts.Etickette.dto.UserDTO;
+import com.sts.Etickette.DTO.UserDTO;
 
 import java.util.List;
 import java.util.Optional;

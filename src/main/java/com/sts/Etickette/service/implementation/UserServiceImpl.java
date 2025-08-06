@@ -1,6 +1,6 @@
 package com.sts.Etickette.service.implementation;
 
-import com.sts.Etickette.dto.UserDTO;
+import com.sts.Etickette.DTO.UserDTO;
 import com.sts.Etickette.entity.User;
 import com.sts.Etickette.exception.EmailAlreadyExistsException;
 import com.sts.Etickette.exception.UserNotFoundException;

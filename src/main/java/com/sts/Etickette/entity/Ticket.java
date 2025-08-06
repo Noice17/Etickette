@@ -33,16 +33,13 @@ public class Ticket {
     @Column(name="resolved_at")
     private LocalDateTime resolvedAt;
 
-    @Column(name="rating")
-    private Double rating;
-
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
-    private Long client;
+    private User client;
 
     @ManyToOne
-    @JoinColumn(name="agent_id", nullable = false)
-    private Long agentId;
+    @JoinColumn(name="agent_id", nullable = true)
+    private Agent agent;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable=false, name="priority")
@@ -61,7 +58,7 @@ public class Ticket {
     }
 
     public enum Status{
-        OPEN, IN_PROGRESS, RESOLVED, CLOSED
+        OPEN, IN_PROGRESS, RESOLVED, CLOSED, QUEUED
     }
 
     public enum Category {
@@ -76,16 +73,15 @@ public class Ticket {
 
     public Ticket() {}
 
-    public Ticket(Long id, String title, String description, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime resolvedAt, Double rating, Long client, Long agentId, Priority priority, Status status, Category category) {
+    public Ticket(Long id, String title, String description, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime resolvedAt, User client, Agent agent, Priority priority, Status status, Category category) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.resolvedAt = resolvedAt;
-        this.rating = rating;
         this.client = client;
-        this.agentId = agentId;
+        this.agent = agent;
         this.priority = priority;
         this.status = status;
         this.category = category;
@@ -139,28 +135,20 @@ public class Ticket {
         this.resolvedAt = resolvedAt;
     }
 
-    public Double getRating() {
-        return rating;
-    }
-
-    public void setRating(Double rating) {
-        this.rating = rating;
-    }
-
-    public Long getClient() {
+    public User getClient() {
         return client;
     }
 
-    public void setClient(Long client) {
+    public void setClient(User client) {
         this.client = client;
     }
 
-    public Long getAgent() {
-        return agentId;
+    public Agent getAgent() {
+        return agent;
     }
 
-    public void setAgent(Long agentId) {
-        this.agentId = agentId;
+    public void setAgent(Agent agent) {
+        this.agent = agent;
     }
 
     public Priority getPriority() {

@@ -28,16 +28,16 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
-    private Long userId;
+    private User user;
 
     public Comment() {}
 
-    public Comment(Long id, String message, LocalDateTime createdAt, Ticket ticket, Long userId) {
+    public Comment(Long id, String message, LocalDateTime createdAt, Ticket ticket, User user) {
         this.id = id;
         this.message = message;
         this.createdAt = createdAt;
         this.ticket = ticket;
-        this.userId = userId;
+        this.user = user;
     }
 
     public Long getId() {
@@ -68,15 +68,15 @@ public class Comment {
         return ticket;
     }
 
-    public void setTicket(Ticket ticketId) {
-        this.ticket = ticketId;
+    public void setTicket(Ticket ticket) {
+        this.ticket = ticket;
     }
 
-    public Long getUser() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUser(Long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

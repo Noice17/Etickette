@@ -1,24 +1,41 @@
 package com.sts.Etickette.DTO;
 
+import com.sts.Etickette.entity.Agent;
+import com.sts.Etickette.entity.Ticket;
+import com.sts.Etickette.entity.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public class TicketDTO {
     private Long id;
+
+    @NotBlank(message = "Title is required")
     private String title;
+
+    @NotBlank(message = "Description is required")
     private String description;
-    private String status;
-    private String priority;
-    private String category;
+
+    @NotNull(message = "Status is required")
+    private Ticket.Status status;
+
+    @NotNull(message = "Priority is required")
+    private Ticket.Priority priority;
+
+    @NotNull(message = "Category is required")
+    private Ticket.Category category;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime resolvedAt;
-    private Double rating;
-    private Long userId;
-    private Long agentId;
+
+    @NotNull(message = "Client is required")
+    private User client;
+    private Agent agent;
 
     public TicketDTO() {}
 
-    public TicketDTO(Long id, String title, String description, String status, String priority, String category, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime resolvedAt, Double rating, Long userId, Long agentId) {
+    public TicketDTO(Long id, String title, String description, Ticket.Status status, Ticket.Priority priority, Ticket.Category category, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime resolvedAt, User client, Agent agent) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -28,9 +45,8 @@ public class TicketDTO {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.resolvedAt = resolvedAt;
-        this.rating = rating;
-        this.userId = userId;
-        this.agentId = agentId;
+        this.client = client;
+        this.agent = agent;
     }
 
     public Long getId() {
@@ -57,27 +73,27 @@ public class TicketDTO {
         this.description = description;
     }
 
-    public String getStatus() {
+    public Ticket.Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Ticket.Status status) {
         this.status = status;
     }
 
-    public String getPriority() {
+    public Ticket.Priority getPriority() {
         return priority;
     }
 
-    public void setPriority(String priority) {
+    public void setPriority(Ticket.Priority priority) {
         this.priority = priority;
     }
 
-    public String getCategory() {
+    public Ticket.Category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(Ticket.Category category) {
         this.category = category;
     }
 
@@ -105,27 +121,19 @@ public class TicketDTO {
         this.resolvedAt = resolvedAt;
     }
 
-    public Double getRating() {
-        return rating;
+    public User getClient() {
+        return client;
     }
 
-    public void setRating(Double rating) {
-        this.rating = rating;
+    public void setClient(User client) {
+        this.client = client;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Agent getAgent() {
+        return agent;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getAgentId() {
-        return agentId;
-    }
-
-    public void setAgentId(Long agentId) {
-        this.agentId = agentId;
+    public void setAgent(Agent agent) {
+        this.agent = agent;
     }
 }

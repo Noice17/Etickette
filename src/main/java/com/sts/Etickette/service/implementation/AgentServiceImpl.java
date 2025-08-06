@@ -1,6 +1,6 @@
 package com.sts.Etickette.service.implementation;
 
-import com.sts.Etickette.dto.AgentDTO;
+import com.sts.Etickette.DTO.AgentDTO;
 import com.sts.Etickette.entity.Agent;
 import com.sts.Etickette.mapper.AgentMapper;
 import com.sts.Etickette.repository.AgentRepository;

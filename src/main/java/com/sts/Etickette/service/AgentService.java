@@ -1,6 +1,6 @@
 package com.sts.Etickette.service;
 
-import com.sts.Etickette.dto.AgentDTO;
+import com.sts.Etickette.DTO.AgentDTO;
 
 public interface AgentService {
     AgentDTO updateAgent(Long agentId, AgentDTO agentDTO);

@@ -1,6 +1,6 @@
 package com.sts.Etickette.controller;
 
-import com.sts.Etickette.dto.AgentDTO;
+import com.sts.Etickette.DTO.AgentDTO;
 import com.sts.Etickette.service.AgentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

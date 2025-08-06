@@ -1,24 +1,33 @@
 package com.sts.Etickette.DTO;
 
 import com.sts.Etickette.entity.Ticket;
-
+import com.sts.Etickette.entity.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public class CommentDTO {
     private Long id;
+
+    @NotBlank(message = "Message is required")
     private String message;
+
     private LocalDateTime createdAt;
-    private Ticket ticketId;
-    private Long userId;
+
+    @NotNull(message = "Ticket is required")
+    private Ticket ticket;
+
+    @NotNull(message = "User is required")
+    private User user;
 
     public CommentDTO() {}
 
-    public CommentDTO(Long id, String message, LocalDateTime createdAt, Ticket ticketId, Long userId) {
+    public CommentDTO(Long id, String message, LocalDateTime createdAt, Ticket ticket, User user) {
         this.id = id;
         this.message = message;
         this.createdAt = createdAt;
-        this.ticketId = ticketId;
-        this.userId = userId;
+        this.ticket = ticket;
+        this.user = user;
     }
 
     public Long getId() {
@@ -45,19 +54,19 @@ public class CommentDTO {
         this.createdAt = createdAt;
     }
 
-    public Ticket getTicketId() {
-        return ticketId;
+    public Ticket getTicket() {
+        return ticket;
     }
 
-    public void setTicketId(Ticket ticketId) {
-        this.ticketId = ticketId;
+    public void setTicket(Ticket ticket) {
+        this.ticket = ticket;
     }
 
-    public Long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 }
