@@ -3,9 +3,6 @@ package com.sts.Etickette.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "agents")
 public class Agent {
@@ -19,30 +16,26 @@ public class Agent {
     @JsonBackReference
     private User user;
 
-
     @Column(name = "max_workload", nullable = false)
     private int maxWorkload = 25;
 
     @Column(name = "current_workload", nullable = false)
     private int currentWorkload = 0;
 
-    @ElementCollection
-    @CollectionTable(name = "agent_ratings", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "rating")
-    private List<Integer> rating = new ArrayList<>();
-
     @Column(name = "average_rating")
     private double averageRating = 0.0;
 
+    @Column(name = "rating_count")
+    private int ratingCount = 0;
 
     public Agent() {}
 
-    public Agent(User user, int maxWorkload, int currentWorkload, List<Integer> rating, double averageRating) {
+    public Agent(User user, int maxWorkload, int currentWorkload, double averageRating, int ratingCount) {
         this.user = user;
         this.maxWorkload = maxWorkload;
         this.currentWorkload = currentWorkload;
-        this.rating = rating;
         this.averageRating = averageRating;
+        this.ratingCount = ratingCount;
     }
 
     public Long getUserId() {
@@ -77,19 +70,25 @@ public class Agent {
         this.currentWorkload = currentWorkload;
     }
 
-    public List<Integer> getRating() {
-        return rating;
-    }
-
-    public void setRating(List<Integer> rating) {
-        this.rating = rating;
-    }
-
     public double getAverageRating() {
         return averageRating;
     }
 
     public void setAverageRating(double averageRating) {
         this.averageRating = averageRating;
+    }
+
+    public int getRatingCount() {
+        return ratingCount;
+    }
+
+    public void setRatingCount(int ratingCount) {
+        this.ratingCount = ratingCount;
+    }
+
+    public void addRating(int newRating) {
+        double totalRating = this.averageRating * this.ratingCount;
+        this.ratingCount++;
+        this.averageRating = (totalRating + newRating) / this.ratingCount;
     }
 }
