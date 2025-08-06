@@ -34,7 +34,7 @@ public class Ticket {
     private LocalDateTime resolvedAt;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name="client_id", nullable = false)
     private User client;
 
     @ManyToOne
