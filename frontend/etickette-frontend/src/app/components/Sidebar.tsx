@@ -11,6 +11,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 type Props = {
   collapsed: boolean;
@@ -23,7 +24,7 @@ export default function Sidebar({ collapsed, toggleCollapsed }: Props) {
   const handleLogout = () => {
     // Clear localStorage
     localStorage.removeItem("token");
-    localStorage.removeItem("auth"); // if you're still storing this
+    toast.success("Logout Successful!");
     document.cookie = "token=; Max-Age=0; path=/"; // clear cookie if you're using one
 
     // Redirect to login
