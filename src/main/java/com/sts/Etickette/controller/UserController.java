@@ -1,6 +1,6 @@
 package com.sts.Etickette.controller;
 
-import com.sts.Etickette.dto.UserDTO;
+import com.sts.Etickette.DTO.UserDTO;
 import com.sts.Etickette.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

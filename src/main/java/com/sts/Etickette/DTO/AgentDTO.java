@@ -1,30 +1,26 @@
-package com.sts.Etickette.dto;
+package com.sts.Etickette.DTO;
 
-import com.sts.Etickette.entity.User;
+import java.util.List;
 
 public class AgentDTO {
-    private Long id;
     private Long userId;
     private int maxWorkload;
     private int currentWorkload;
+    private List<Integer> rating;
+    private double averageRating = 0.0;
 
     public AgentDTO() {
     }
 
-    public AgentDTO(Long id, Long userId, int maxWorkload, int currentWorkload) {
-        this.id = id;
+    public AgentDTO(Long userId, int maxWorkload, int currentWorkload, List<Integer> rating, double averageRating) {
         this.userId = userId;
         this.maxWorkload = maxWorkload;
         this.currentWorkload = currentWorkload;
+        this.rating = rating;
+        this.averageRating = averageRating;
     }
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getUserId() {
         return userId;
@@ -48,5 +44,21 @@ public class AgentDTO {
 
     public void setCurrentWorkload(int currentWorkload) {
         this.currentWorkload = currentWorkload;
+    }
+
+    public List<Integer> getRating() {
+        return rating;
+    }
+
+    public void setRating(List<Integer> rating) {
+        this.rating = rating;
+    }
+
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(double averageRating) {
+        this.averageRating = averageRating;
     }
 }

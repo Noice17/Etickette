@@ -1,6 +1,6 @@
 package com.sts.Etickette.controller;
 
-import com.sts.Etickette.dto.AgentDTO;
+import com.sts.Etickette.DTO.AgentDTO;
 import com.sts.Etickette.service.AgentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,4 +24,13 @@ public class AgentController {
     public ResponseEntity<AgentDTO> updateAgent(@PathVariable Long id, @RequestBody AgentDTO dto) {
         return ResponseEntity.ok(agentService.updateAgent(id, dto));
     }
+
+    @PostMapping("/{agentId}/ratings")
+    public ResponseEntity<AgentDTO> addRating(
+            @PathVariable Long agentId,
+            @RequestParam int rating) {
+        AgentDTO updatedAgent = agentService.addRating(agentId, rating);
+        return ResponseEntity.ok(updatedAgent);
+    }
+
 }

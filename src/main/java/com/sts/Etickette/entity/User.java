@@ -1,5 +1,6 @@
 package com.sts.Etickette.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -26,6 +27,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name="role")
     private UserRole role;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Agent agent;
 
     @CreatedDate
     @Column(updatable = false, nullable = true)

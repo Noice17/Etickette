@@ -1,6 +1,6 @@
 package com.sts.Etickette.controller;
 
-import com.sts.Etickette.dto.UserDTO;
+import com.sts.Etickette.DTO.UserDTO;
 import com.sts.Etickette.entity.LoginRequest;
 import com.sts.Etickette.entity.User;
 import com.sts.Etickette.exception.EmailAlreadyExistsException;
@@ -77,7 +77,10 @@ public class AuthController {
             throw new EmailAlreadyExistsException(errorMessage);
         }
 
-        userDTO.setRole(User.UserRole.CLIENT);
+        if (userDTO.getRole() == null) {
+            userDTO.setRole(User.UserRole.CLIENT);
+        }
+
         UserDTO created = userService.createUser(userDTO);
 
         Map<String, Object> response = new HashMap<>();

@@ -1,6 +1,6 @@
 package com.sts.Etickette.mapper;
 
-import com.sts.Etickette.dto.UserDTO;
+import com.sts.Etickette.DTO.UserDTO;
 import com.sts.Etickette.entity.User;
 
 public class UserMapper {

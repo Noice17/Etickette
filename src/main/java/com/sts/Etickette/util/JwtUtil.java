@@ -38,10 +38,10 @@ public class JwtUtil {
 
     public String extractUsername(String token) {
         return Jwts.parser()
-                .verifyWith(secretKey)
+                .setSigningKey(secretKey)
                 .build()
-                .parseSignedClaims(token)
-                .getPayload()
+                .parseClaimsJws(token)
+                .getBody()
                 .getSubject();
     }
 
@@ -52,11 +52,11 @@ public class JwtUtil {
 
     private boolean isExpired(String token) {
         Date expirationDate = Jwts.parser()
-                .verifyWith(secretKey)
+                .setSigningKey(secretKey)
                 .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getExpiration();
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration(); // <-- This returns a Date
         return expirationDate.before(new Date());
     }
 }
