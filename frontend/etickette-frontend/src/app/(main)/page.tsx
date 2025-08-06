@@ -3,10 +3,11 @@
 
 
 import { Clock, FileChartColumnIcon, Star, Ticket } from "lucide-react";
-import ResolutionTimeChart from "../components/ResolutionTimeChart";
-import PriorityTicketChart from "../components/PriorityTicketChart";
+// import ResolutionTimeChart from "../components/dashboard/ResolutionTimeChart";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import ResolutionTimeChart from "../components/dashboard/ResolutionTimeChart";
+import PriorityTicketChart from "../components/dashboard/PriorityTicketChart";
 
 export default function Home() {
   const router = useRouter();
@@ -35,7 +36,8 @@ export default function Home() {
 
       {/* Metrics Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Total Tickets */}
+
+        {/* Ave Resolution Time */}
         <div className="bg-slate-700 p-6 rounded-xl text-white">
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-green-500 rounded-lg">
@@ -46,7 +48,7 @@ export default function Home() {
           <p className="text-slate-300 text-sm">Ave Resolution Time</p>
         </div>
 
-        {/* Open Tickets */}
+        {/* Total Ticket */}
         <div className="bg-slate-700 p-6 rounded-xl text-white">
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-blue-500 rounded-lg">
@@ -70,14 +72,13 @@ export default function Home() {
 
         {/* Controls */}
         <div className="bg-slate-700 p-6 rounded-xl">
-          <h3 className="text-2xl font-bold mb-1">Controls</h3>
-          <div className="">
+          <div className="mb-3">
             <button className="flex gap-2 items text-white bg-red-500 p-2 hover:bg-red-600 items-center justify-center rounded">
               <FileChartColumnIcon />
               <p>Generate Report</p>
             </button>
-            
           </div>
+          <h3 className="text-2xl font-bold text-white">Controls</h3>
         </div>
       </div>
 

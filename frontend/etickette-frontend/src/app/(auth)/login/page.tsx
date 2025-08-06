@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/utils/apiFetch";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -44,10 +45,11 @@ export default function LoginPage() {
       }
 
       localStorage.setItem("token", token);
-      router.push("/"); // redirect to dashboard/home
+      router.push("/");
+      toast.success("Login successful!")
     } catch (error) {
       console.error("Login error:", error);
-      alert("Invalid email or password");
+      toast.error("Invalid email or password");
     }
   };
 

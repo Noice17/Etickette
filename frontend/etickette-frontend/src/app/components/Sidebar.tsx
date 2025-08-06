@@ -32,7 +32,7 @@ export default function Sidebar({ collapsed, toggleCollapsed }: Props) {
 
   return (
     <aside
-      className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-indigo-600 shadow transition-all duration-300 ${
+      className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-indigo-600 text-azure-300 shadow transition-all duration-300 ${
         collapsed ? "w-16" : "w-50"
       } flex flex-col justify-between`}
     >
