@@ -7,6 +7,7 @@ import com.sts.Etickette.entity.User;
 import com.sts.Etickette.mapper.TicketMapper;
 import com.sts.Etickette.repository.AgentRepository;
 import com.sts.Etickette.repository.TicketRepository;
+import com.sts.Etickette.repository.UserRepository;
 import com.sts.Etickette.service.TicketService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,12 @@ import java.util.stream.Collectors;
 public class TicketServiceImpl implements TicketService {
     private final TicketRepository ticketRepository;
     private final AgentRepository agentRepository;
+    private final UserRepository userRepository;
 
-    public TicketServiceImpl(TicketRepository ticketRepository, AgentRepository agentRepository) {
+    public TicketServiceImpl(TicketRepository ticketRepository, AgentRepository agentRepository, UserRepository userRepository) {
         this.ticketRepository = ticketRepository;
         this.agentRepository = agentRepository;
+        this.userRepository = userRepository;
     }
 
     private static final Map<Ticket.Category, Ticket.Priority> CATEGORY_PRIORITY_MAP = Map.of(
@@ -74,11 +77,13 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketDTO createTicket(TicketDTO dto){
+    public TicketDTO createTicket(TicketDTO dto) {
+        // Map category to priority
         Ticket.Category category = dto.getCategory();
         Ticket.Priority mappedPriority = CATEGORY_PRIORITY_MAP.getOrDefault(category, Ticket.Priority.LOW);
         dto.setPriority(mappedPriority);
 
+        // Assign agent if available
         int workloadIncrement = getPriorityWeight(mappedPriority);
         Optional<Agent> agentOpt = findAvailableAgent(workloadIncrement);
 
@@ -93,10 +98,22 @@ public class TicketServiceImpl implements TicketService {
             dto.setStatus(Ticket.Status.QUEUED);
         }
 
+//        // ✅ Ensure client is fetched and set (this prevents 'client_id' NULL in DB)
+//        if (dto.getClient() == null || dto.getClient().getId() == null) {
+//            throw new RuntimeException("Client ID is required to create a ticket");
+//        }
+
+        User client = userRepository.findById(dto.getClient().getId())
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+        dto.setClient(client);
+
+        // Convert to entity and save
         Ticket ticket = TicketMapper.toEntity(dto);
         Ticket savedTicket = ticketRepository.save(ticket);
+
         return TicketMapper.toDTO(savedTicket);
     }
+
 
     @Override
     public void deleteTicket(Long id){
@@ -244,7 +261,7 @@ public class TicketServiceImpl implements TicketService {
         return resolvedTickets.stream()
                 .filter(t -> t.getAgent() != null && t.getCreatedAt() != null && t.getResolvedAt() != null)
                 .collect(Collectors.groupingBy(
-                        t -> t.getAgent().getId(),
+                        t -> t.getAgent().getUserId(),
                         Collectors.averagingDouble(t -> Duration.between(t.getCreatedAt(), t.getResolvedAt()).toMinutes() / 60.0)
                 ));
     }

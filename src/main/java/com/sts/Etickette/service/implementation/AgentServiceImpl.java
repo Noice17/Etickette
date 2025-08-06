@@ -7,15 +7,18 @@ import com.sts.Etickette.repository.AgentRepository;
 import com.sts.Etickette.service.AgentService;
 import com.sts.Etickette.exception.ResourceNotFoundException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AgentServiceImpl implements AgentService {
 
     private final AgentRepository agentRepository;
+    private final AgentMapper agentMapper;
 
-    public AgentServiceImpl(AgentRepository agentRepository) {
+    public AgentServiceImpl(AgentRepository agentRepository, AgentMapper agentMapper) {
         this.agentRepository = agentRepository;
+        this.agentMapper = agentMapper;
     }
 
     @Override
@@ -36,6 +39,19 @@ public class AgentServiceImpl implements AgentService {
         Agent updated = agentRepository.save(agent);
         return AgentMapper.toDTO(updated);
     }
+
+    @Override
+    public AgentDTO addRating(Long agentId, int rating) {
+        Agent agent = agentRepository.findById(agentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Agent not found"));
+
+        agent.getRating().add(rating);
+        agentRepository.save(agent);
+
+        return agentMapper.toDTO(agent);
+    }
+
+
     @Override
     public AgentDTO incrementWorkload(Long agentId) {
         Agent agent = agentRepository.findById(agentId)

@@ -7,4 +7,5 @@ public interface AgentService {
     AgentDTO getAgentById(Long agentId);
     AgentDTO incrementWorkload(Long agentId);
     AgentDTO decrementWorkload(Long agentId);
+    AgentDTO addRating(Long agentId, int rating);
 }

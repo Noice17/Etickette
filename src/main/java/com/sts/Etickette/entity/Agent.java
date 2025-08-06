@@ -1,19 +1,24 @@
 package com.sts.Etickette.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "agents")
 public class Agent {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "agent_id")
-    private Long id;
+    private Long userId;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @MapsId
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
+
 
     @Column(name = "max_workload", nullable = false)
     private int maxWorkload = 25;
@@ -21,21 +26,31 @@ public class Agent {
     @Column(name = "current_workload", nullable = false)
     private int currentWorkload = 0;
 
+    @ElementCollection
+    @CollectionTable(name = "agent_ratings", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "rating")
+    private List<Integer> rating = new ArrayList<>();
+
+    @Column(name = "average_rating")
+    private double averageRating = 0.0;
+
+
     public Agent() {}
 
-    public Agent(Long id, User user, int maxWorkload, int currentWorkload) {
-        this.id = id;
+    public Agent(User user, int maxWorkload, int currentWorkload, List<Integer> rating, double averageRating) {
         this.user = user;
         this.maxWorkload = maxWorkload;
         this.currentWorkload = currentWorkload;
+        this.rating = rating;
+        this.averageRating = averageRating;
     }
 
-    public Long getId() {
-        return id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public User getUser() {
@@ -60,5 +75,21 @@ public class Agent {
 
     public void setCurrentWorkload(int currentWorkload) {
         this.currentWorkload = currentWorkload;
+    }
+
+    public List<Integer> getRating() {
+        return rating;
+    }
+
+    public void setRating(List<Integer> rating) {
+        this.rating = rating;
+    }
+
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(double averageRating) {
+        this.averageRating = averageRating;
     }
 }
