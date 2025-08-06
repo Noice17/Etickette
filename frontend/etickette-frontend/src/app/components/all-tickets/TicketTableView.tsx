@@ -35,7 +35,7 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-slate-700 font-semibold border-b border-b-slate-800">
-            <tr className="text-left text-[9px] uppercase">
+            <tr className="text-left text-xs uppercase">
               <th className="px-6 py-3 tracking-wider">
                 Ticket ID
               </th>
