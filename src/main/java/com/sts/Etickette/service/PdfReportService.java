@@ -65,6 +65,30 @@ public class PdfReportService {
             document.add(statusTable);
             document.add(Chunk.NEWLINE);
 
+            document.add(new Paragraph("Ticket Count by Priority:", labelFont));
+            PdfPTable priorityTable = new PdfPTable(2);
+            priorityTable.setWidthPercentage(50);
+            priorityTable.addCell("Priority");
+            priorityTable.addCell("Count");
+            for (Map.Entry<Ticket.Priority, Long> entry : ticketService.getTicketCountByPriority().entrySet()) {
+                priorityTable.addCell(entry.getKey().toString());
+                priorityTable.addCell(String.valueOf(entry.getValue()));
+            }
+            document.add(priorityTable);
+            document.add(Chunk.NEWLINE);
+
+            document.add(new Paragraph("Ticket Count by Category:", labelFont));
+            PdfPTable categoryTable = new PdfPTable(2);
+            categoryTable.setWidthPercentage(50);
+            categoryTable.addCell("Category");
+            categoryTable.addCell("Count");
+            for (Map.Entry<Ticket.Category, Long> entry : ticketService.getTicketCountByCategory().entrySet()) {
+                categoryTable.addCell(entry.getKey().toString());
+                categoryTable.addCell(String.valueOf(entry.getValue()));
+            }
+            document.add(categoryTable);
+            document.add(Chunk.NEWLINE);
+
             document.add(new Paragraph("Average Resolution Time Per Agent (hours):", labelFont));
             PdfPTable agentTable = new PdfPTable(2);
             agentTable.setWidthPercentage(80);
@@ -89,6 +113,24 @@ public class PdfReportService {
                 ratingTable.addCell(String.format("%.2f", agent.getAverageRating()));
             }
             document.add(ratingTable);
+            document.add(Chunk.NEWLINE);
+
+            document.add(new Paragraph("Total Tickets Resolved Per Agent:", labelFont));
+            PdfPTable resolvedTable = new PdfPTable(3);
+            resolvedTable.setWidthPercentage(100);
+            resolvedTable.addCell("Agent ID");
+            resolvedTable.addCell("Agent Name");
+            resolvedTable.addCell("Resolved Tickets");
+
+            Map<Long, Long> resolvedCountMap = ticketService.getResolvedTicketCountPerAgent();
+
+            for (Agent agent : agentRepository.findAll()) {
+                resolvedTable.addCell(String.valueOf(agent.getUserId()));
+                resolvedTable.addCell(agent.getUser().getUsername());
+                long resolvedCount = resolvedCountMap.getOrDefault(agent.getUserId(), 0L);
+                resolvedTable.addCell(String.valueOf(resolvedCount));
+            }
+            document.add(resolvedTable);
 
             document.close();
 

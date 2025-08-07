@@ -287,6 +287,16 @@ public class TicketServiceImpl implements TicketService {
                 .collect(Collectors.groupingBy(Ticket::getStatus, Collectors.counting()));
     }
 
+    public Map<Ticket.Category, Long> getTicketCountByCategory(){
+        return ticketRepository.findAll().stream()
+                .collect(Collectors.groupingBy(Ticket::getCategory, Collectors.counting()));
+    }
+
+    public Map<Ticket.Priority, Long> getTicketCountByPriority(){
+        return ticketRepository.findAll().stream()
+                .collect(Collectors.groupingBy(Ticket::getPriority, Collectors.counting()));
+    }
+
     @Override
     public Map<Long, Double> getAverageResolutionTimePerAgent() {
         List<Ticket> resolvedTickets = ticketRepository.findByStatusIn(List.of(Ticket.Status.RESOLVED, Ticket.Status.CLOSED));
@@ -295,6 +305,17 @@ public class TicketServiceImpl implements TicketService {
                 .collect(Collectors.groupingBy(
                         t -> t.getAgent().getUserId(),
                         Collectors.averagingDouble(t -> Duration.between(t.getCreatedAt(), t.getResolvedAt()).toMinutes() / 60.0)
+                ));
+    }
+
+    @Override
+    public Map<Long, Long> getResolvedTicketCountPerAgent(){
+        List<Ticket> resolved = ticketRepository.findByStatusIn(List.of(Ticket.Status.RESOLVED, Ticket.Status.CLOSED));
+        return resolved.stream()
+                .filter(t -> t.getAgent() != null)
+                .collect(Collectors.groupingBy(
+                        t -> t.getAgent().getUserId(),
+                        Collectors.counting()
                 ));
     }
 

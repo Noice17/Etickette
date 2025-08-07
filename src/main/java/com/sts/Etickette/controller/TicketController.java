@@ -104,7 +104,7 @@ public class TicketController {
     }
 
     @GetMapping("/agent/{agentId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT')")
     public ResponseEntity<?> getTicketByAgent(@PathVariable Long agentId) {
         Optional<Agent> agentOpt = agentRepository.findById(agentId);
         if (agentOpt.isEmpty()) {
@@ -197,10 +197,28 @@ public class TicketController {
         return ticketService.getTicketCountByStatus();
     }
 
+    @GetMapping("/metrics/category-count")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Map<Ticket.Category, Long> getTicketCountByCategory() {
+        return ticketService.getTicketCountByCategory();
+    }
+
+    @GetMapping("/metrics/priority-count")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Map<Ticket.Priority, Long> getTicketCountByPriority() {
+        return ticketService.getTicketCountByPriority();
+    }
+
     @GetMapping("/metrics/agent-average-resolution")
     @PreAuthorize("hasRole('ADMIN')")
     public Map<Long, Double> getAverageResolutionTimePerAgent() {
         return ticketService.getAverageResolutionTimePerAgent();
+    }
+
+    @GetMapping("/metrics/agent-total-resolved")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Map<Long, Long> getResolvedTicketCountPerAgent(){
+        return ticketService.getResolvedTicketCountPerAgent();
     }
 
     @PutMapping("/{ticketId}/rate")
