@@ -27,9 +27,13 @@ public interface TicketService {
     List<TicketDTO> getTicketByResolutionDate(LocalDateTime date);
     List<TicketDTO> getAll();
     double getAverageResolutionTimeHours();
+    double getAverageRatings();
     long getTotalTicketsCreated();
     long getTotalTicketsResolved();
     Map<Ticket.Status, Long> getTicketCountByStatus();
+    Map<Ticket.Category, Long> getTicketCountByCategory();
+    Map<Ticket.Priority, Long> getTicketCountByPriority();
     Map<Long, Double> getAverageResolutionTimePerAgent();
+    Map<Long, Long> getResolvedTicketCountPerAgent();
     void rateAgent(Long ticketId, int rating, Authentication authentication);
 }

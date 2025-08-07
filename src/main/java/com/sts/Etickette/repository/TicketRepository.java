@@ -17,5 +17,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByAgent(Agent agent);
     List<Ticket> findByTitle(String title);
     List<Ticket> findByDescription(String description);
-    List<Ticket> findByStatusOrderByCreatedAtAsc(Ticket.Status status);
+    List<Ticket> findByStatusIn(List<Ticket.Status> statuses);
 }
