@@ -84,7 +84,6 @@ public class TicketServiceImpl implements TicketService {
     public TicketDTO createTicket(TicketDTO dto) {
         Ticket.Category category = dto.getCategory();
         Ticket.Priority mappedPriority = CATEGORY_PRIORITY_MAP.getOrDefault(category, Ticket.Priority.LOW);
-        dto.setPriority(mappedPriority);
 
         int workloadIncrement = getPriorityWeight(mappedPriority);
         Optional<Agent> agentOpt = findAvailableAgent(workloadIncrement);
@@ -105,6 +104,7 @@ public class TicketServiceImpl implements TicketService {
         dto.setClient(client);
 
         Ticket ticket = TicketMapper.toEntity(dto);
+        ticket.setPriority(mappedPriority);
         Ticket savedTicket = ticketRepository.save(ticket);
 
         emailService.sendHtmlEmail(ticket.getClient().getEmail(),
