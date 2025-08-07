@@ -11,6 +11,7 @@ import com.sts.Etickette.repository.UserRepository;
 import com.sts.Etickette.service.EmailService;
 import com.sts.Etickette.service.TicketService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -119,9 +120,15 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void updateTicket(Long id, TicketDTO dto){
+    public void updateTicket(Long id, TicketDTO dto, Authentication authentication){
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
+
+        String currentUserEmail = authentication.getName();
+        Agent assignedAgent = ticket.getAgent();
+        if (assignedAgent == null || !assignedAgent.getUser().getEmail().equals(currentUserEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException("You are not authorized to update this ticket");
+        }
         Ticket.Status oldStatus = ticket.getStatus();
         Ticket.Status newStatus = dto.getStatus();
 
@@ -275,10 +282,15 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void rateAgent(Long ticketId, int rating){
+    public void rateAgent(Long ticketId, int rating, Authentication authentication){
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
         Agent agent = ticket.getAgent();
+
+        String currentUserEmail = authentication.getName();
+        if (!ticket.getClient().getEmail().equals(currentUserEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException("Only the ticket owner can rate the agent");
+        }
 
         if (agent == null) throw new IllegalStateException("No agent assigned to this ticket");
         if (ticket.getRating() != null) throw new IllegalStateException("Ticket already rated");

@@ -12,6 +12,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -63,12 +64,14 @@ public class TicketController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<?> updateTicket(@PathVariable Long id, @Valid @RequestBody TicketDTO dto) {
+    public ResponseEntity<?> updateTicket(@PathVariable Long id, @Valid @RequestBody TicketDTO dto, Authentication authentication) {
         try {
-            ticketService.updateTicket(id, dto);
+            ticketService.updateTicket(id, dto, authentication);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ticket not found.");
+        } catch (org.springframework.security.access.AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to update this ticket.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not update ticket: " + e.getMessage());
         }
@@ -202,10 +205,13 @@ public class TicketController {
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<?> rateAgent(
             @PathVariable Long ticketId,
-            @RequestParam int rating) {
+            @RequestParam int rating,
+            Authentication authentication) {
         try {
-            ticketService.rateAgent(ticketId, rating);
+            ticketService.rateAgent(ticketId, rating, authentication);
             return ResponseEntity.ok("Rating submitted!");
+        } catch (org.springframework.security.access.AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only the ticket owner can rate the agent.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
