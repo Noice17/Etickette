@@ -27,6 +27,7 @@ public interface TicketService {
     List<TicketDTO> getTicketByResolutionDate(LocalDateTime date);
     List<TicketDTO> getAll();
     double getAverageResolutionTimeHours();
+    double getAverageRatings();
     long getTotalTicketsCreated();
     long getTotalTicketsResolved();
     Map<Ticket.Status, Long> getTicketCountByStatus();

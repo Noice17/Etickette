@@ -272,6 +272,15 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public double getAverageRatings() {
+        return ticketRepository.findAll().stream()
+                .filter(t -> t.getRating() != null)
+                .mapToInt(Ticket::getRating)
+                .average()
+                .orElse(0.0);
+    }
+
+    @Override
     public long getTotalTicketsCreated() {
         return ticketRepository.count();
     }
