@@ -93,7 +93,7 @@ public class TicketController {
     }
 
     @GetMapping("/client/{clientId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','CLIENT','AGENT')")
     public ResponseEntity<?> getTicketByClient(@PathVariable Long clientId) {
         Optional<User> clientOpt = userRepository.findById(clientId);
         if (clientOpt.isEmpty()) {

@@ -313,10 +313,6 @@ public class TicketServiceImpl implements TicketService {
             throw new IllegalArgumentException("Rating must be between 1 and 5");
         }
 
-        if (rating < 1 || rating > 5) {
-            throw new IllegalArgumentException("Rating must be between 1 and 5");
-        }
-
         ticket.setStatus(Ticket.Status.CLOSED);
 
         ticket.setRating(rating);

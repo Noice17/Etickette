@@ -12,8 +12,8 @@ public class TicketMapper {
         dto.setTitle(ticket.getTitle());
         dto.setDescription(ticket.getDescription());
         dto.setStatus(ticket.getStatus());
-        dto.setPriority(ticket.getPriority());
         dto.setCategory(ticket.getCategory());
+        dto.setPriority(ticket.getPriority());
         dto.setCreatedAt(ticket.getCreatedAt());
         dto.setUpdatedAt(ticket.getUpdatedAt());
         dto.setResolvedAt(ticket.getResolvedAt());
@@ -30,8 +30,8 @@ public class TicketMapper {
         ticket.setTitle(dto.getTitle());
         ticket.setDescription(dto.getDescription());
         ticket.setStatus(dto.getStatus());
-        ticket.setPriority(dto.getPriority());
         ticket.setCategory(dto.getCategory());
+        ticket.setPriority(dto.getPriority());
         ticket.setCreatedAt(dto.getCreatedAt());
         ticket.setUpdatedAt(dto.getUpdatedAt());
         ticket.setResolvedAt(dto.getResolvedAt());
