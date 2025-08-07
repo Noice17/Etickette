@@ -2,6 +2,7 @@ import React from "react";
 
 export interface Ticket {
   id: string;
+  title: string;
   description: string;
   category: string;
   requestedBy: string;
@@ -40,7 +41,7 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
                 Ticket ID
               </th>
               <th className="px-6 py-3 tracking-wider">
-                Description
+                Info
               </th>
               <th className="px-6 py-3 tracking-wider">
                 Category
@@ -63,7 +64,8 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
                   {ticket.id}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-100 max-w-md">
-                  <div className="truncate">{ticket.description}</div>
+                  <div className="font-semibold">{ticket.title}</div>
+                  <div className="truncate text-[11px] text-slate-400">{ticket.description}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-100 max-w-md">
                   {ticket.category}

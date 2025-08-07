@@ -27,39 +27,54 @@ export default function ViewClients() {
   const [sortField, setSortField] = useState<keyof Client>("id");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  useEffect(() => {
+  useEffect(() =>{
     const fetchClients = async () => {
-      try {
-        const res = await apiFetch("/users");
+      try{
+        const [clientsRes, ticketsRes] = await Promise.all([
+          apiFetch("/users"),
+          apiFetch("/tickets/all")
+        ])
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch users");
+        if(!clientsRes.ok || !ticketsRes.ok){
+          throw new Error('Failed to fetch data')
         }
 
-        const data = await res.json();
+        const clientsData = await clientsRes.json();
+        const ticketsData = await ticketsRes.json();
 
-        const clientUsers: Client[] = data
-          .filter((user: any) => user.role === "CLIENT")
-          .map((user: any, index: number) => ({
-            id: `CLT-${user.id.toString().padStart(3, "0")}`,
-            email: user.email,
-            name: user.username,
-            liveTickets: Math.floor(Math.random() * 20) + 5,
-            resolvedTickets: Math.floor(Math.random() * 20) + 5,
-          }));
+        const clientUsers: Client[] = clientsData
+        .filter((user: any) => user.role === "CLIENT")
+        .map((client: any) => {
+          const liveTickets = ticketsData.filter(
+            (ticket: any) =>
+              ticket.client?.id === client.id && ticket.resolvedAt === null
+          ).length;
+
+          const resolvedTickets = ticketsData.filter(
+            (ticket: any) =>
+              ticket.client?.id === client.id && ticket.resolvedAt !== null
+          ).length;
+
+          return{
+            id: client.id,
+            name: client.username,
+            email: client.email,
+            liveTickets,
+            resolvedTickets
+          }
+        })
 
         setClients(clientUsers);
-      } catch (error) {
-        toast.error("Failed to load clients");
-      } finally {
-        setLoading(false);
+
+      }catch (error){
+        toast.error("Failed to load clients or tickets");
+        console.error("Error fetching agents or tickets:",error);
       }
-    };
-
-    fetchClients();
-  }, []);
-
-  // Sort clients
+    }
+    fetchClients()
+  },[])
+  
+  
   const sortedClients = [...clients].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
@@ -234,7 +249,7 @@ export default function ViewClients() {
                     className="hover:bg-gray-700 transition-colors"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-azure-500">
-                      {client.id}
+                      CLT-{client.id.toString().padStart(3, "0")}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
                       <div className="flex items-center gap-2">

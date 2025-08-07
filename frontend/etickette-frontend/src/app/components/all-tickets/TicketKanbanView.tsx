@@ -2,6 +2,7 @@ import React from "react";
 
 export interface Ticket {
   id: string;
+  title: string;
   description: string;
   category: string;
   requestedBy: string;
@@ -98,8 +99,12 @@ const TicketKanbanView: React.FC<TicketKanbanViewProps> = ({ tickets }) => {
                         </span>
                       </div>
 
+                      <p className="text-gray-100 text-sm font-semibold line-clamp-3">
+                        {ticket.title}
+                      </p>
+
                       {/* Description */}
-                      <p className="text-gray-100 text-sm mb-3 line-clamp-3">
+                      <p className="text-slate-400 text-xs mb-3 line-clamp-3">
                         {ticket.description}
                       </p>
 

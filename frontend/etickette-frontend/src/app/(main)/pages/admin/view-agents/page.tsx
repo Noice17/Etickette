@@ -14,94 +14,59 @@ import toast from "react-hot-toast";
 import { apiFetch } from "@/utils/apiFetch";
 
 interface Agent {
-  id: string;
+  userId: number;
+  username: string;
   email: string;
-  name: string;
-  unresolvedTickets: number;
-  workload: number;
-  rating: number;
+  maxWorkload: number;
+  currentWorkload: number;
+  averageRating: number;
+  ratingCount: number;
+  unresolvedTickets: number; // computed
 }
 
 export default function ViewAgents() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortField, setSortField] = useState<keyof Agent>("id");
+  const [sortField, setSortField] = useState<keyof Agent>("userId");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
-  // useEffect(() => {
-  //   const fetchAgents = async () => {
-  //     try {
-  //       const res = await apiFetch("/users");
-
-  //       if (!res.ok) {
-  //         throw new Error("Failed to fetch users");
-  //       }
-
-  //       const data = await res.json();
-
-  //       const agentUsers: Agent[] = data
-  //         .filter((user: any) => user.role === "AGENT")
-  //         .map((user: any, index: number) => ({
-  //           id: `AGT-${user.id.toString().padStart(3, "0")}`,
-  //           email: user.email,
-  //           name: user.username,
-  //           unresolvedTickets: Math.floor(Math.random() * 20) + 5, // 5–25 dummy
-  //           workload: Math.floor(Math.random() * 26), // 0–25 dummy
-  //           rating: +(Math.random() * 1.5 + 3.5).toFixed(1), // 3.5–5.0 dummy
-  //         }));
-
-  //       setAgents(agentUsers);
-  //     } catch (error) {
-  //       toast.error("Failed to load agents");
-  //       console.error("Error fetching agents:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchAgents();
-  // }, []);
 
   useEffect(() => {
     const fetchAgentsAndTickets = async () => {
       try {
-        const [usersRes, ticketsRes] = await Promise.all([
-          apiFetch("/users"),
+        const [agentsRes, ticketsRes] = await Promise.all([
+          apiFetch("/agents"),
           apiFetch("/tickets/all"),
         ]);
 
-        if (!usersRes.ok || !ticketsRes.ok) {
+        if (!agentsRes.ok || !ticketsRes.ok) {
           throw new Error("Failed to fetch data");
         }
 
-        const usersData = await usersRes.json();
+        const agentsData = await agentsRes.json();
         const ticketsData = await ticketsRes.json();
 
-        const agentUsers: Agent[] = usersData
-          .filter((user: any) => user.role === "AGENT")
-          .map((user: any) => {
-            const unresolvedTickets = ticketsData.filter(
-              (ticket: any) =>
-                ticket.agent?.userId === user.id && ticket.resolvedAt === null
-            ).length;
+        const agentUsers: Agent[] = agentsData.map((agent: any) => {
+          const unresolvedTickets = ticketsData.filter(
+            (ticket: any) =>
+              ticket.agent?.userId === agent.userId &&
+              ticket.resolvedAt === null
+          ).length;
 
-            const workload = ticketsData.filter(
-              (ticket: any) => ticket.agent?.userId === user.id
-            ).length;
-
-            return {
-              id: `AGT-${user.id.toString().padStart(3, "0")}`,
-              email: user.email,
-              name: user.username,
-              unresolvedTickets,
-              workload,
-              rating: +(Math.random() * 1.5 + 3.5).toFixed(1), // still dummy
-            };
-          });
+          return {
+            userId: agent.userId,
+            username: agent.username,
+            email: agent.email,
+            maxWorkload: agent.maxWorkload,
+            currentWorkload: agent.currentWorkload,
+            averageRating: agent.averageRating,
+            ratingCount: agent.ratingCount,
+            unresolvedTickets,
+          };
+        });
 
         setAgents(agentUsers);
       } catch (error) {
-        toast.error("Failed to load agents");
+        toast.error("Failed to load agents or tickets");
         console.error("Error fetching agents or tickets:", error);
       } finally {
         setLoading(false);
@@ -223,7 +188,7 @@ export default function ViewAgents() {
               <p className="text-gray-400 text-sm">Avg Workload</p>
               <p className="text-white text-xl font-semibold">
                 {(
-                  agents.reduce((sum, agent) => sum + agent.workload, 0) /
+                  agents.reduce((sum, agent) => sum + agent.currentWorkload, 0) /
                   agents.length
                 ).toFixed(1)}
               </p>
@@ -237,7 +202,7 @@ export default function ViewAgents() {
             <div>
               <p className="text-gray-400 text-sm">Overloaded (≥20)</p>
               <p className="text-white text-xl font-semibold">
-                {agents.filter((agent) => agent.workload >= 20).length}
+                {agents.filter((agent) => agent.currentWorkload >= 20).length}
               </p>
             </div>
           </div>
@@ -252,11 +217,11 @@ export default function ViewAgents() {
               <tr>
                 <th
                   className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("id")}
+                  onClick={() => handleSort("userId")}
                 >
                   <div className="flex items-center gap-2">
                     ID
-                    {sortField === "id" && (
+                    {sortField === "userId" && (
                       <span className="text-azure-400">
                         {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
                       </span>
@@ -291,11 +256,11 @@ export default function ViewAgents() {
                 </th>
                 <th
                   className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("workload")}
+                  onClick={() => handleSort("currentWorkload")}
                 >
                   <div className="flex items-center gap-2">
                     Workload
-                    {sortField === "workload" && (
+                    {sortField === "currentWorkload" && (
                       <span className="text-azure-400">
                         {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
                       </span>
@@ -304,11 +269,11 @@ export default function ViewAgents() {
                 </th>
                 <th
                   className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("rating")}
+                  onClick={() => handleSort("averageRating")}
                 >
                   <div className="flex items-center gap-2">
                     Rating
-                    {sortField === "rating" && (
+                    {sortField === "averageRating" && (
                       <span className="text-azure-400">
                         {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
                       </span>
@@ -320,17 +285,17 @@ export default function ViewAgents() {
             <tbody className="bg-slate-600 divide-y divide-slate-800">
               {sortedAgents.map((agent) => (
                 <tr
-                  key={agent.id}
+                  key={agent.userId}
                   className="hover:bg-gray-700 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-azure-500">
-                    {agent.id}
+                    AGT-{agent.userId.toString().padStart(3, "0")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
                     <div className="flex items-center gap-2">
                       <Mail size={16} className="text-gray-400" />
                       <div>
-                        <div className="font-medium">{agent.name}</div>
+                        <div className="font-medium">{agent.username}</div>
                         <div className="text-gray-400 text-xs">
                           {agent.email}
                         </div>
@@ -359,35 +324,35 @@ export default function ViewAgents() {
                       <div className="flex-1">
                         <div className="flex justify-between items-center mb-1">
                           <span className="text-gray-100 text-sm font-medium">
-                            {agent.workload}/25
+                            {agent.currentWorkload}/25
                           </span>
                           <span
                             className={`text-xs font-semibold px-2 py-1 rounded-full ${getWorkloadColor(
-                              agent.workload
+                              agent.currentWorkload
                             )}`}
                           >
-                            {getWorkloadCategory(agent.workload)}
+                            {getWorkloadCategory(agent.currentWorkload)}
                           </span>
                         </div>
                         <div className="w-full bg-slate-700 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full ${
-                              agent.workload >= 20
+                              agent.currentWorkload >= 20
                                 ? "bg-red-500"
-                                : agent.workload >= 15
+                                : agent.currentWorkload >= 15
                                 ? "bg-orange-500"
-                                : agent.workload >= 8
+                                : agent.currentWorkload >= 8
                                 ? "bg-yellow-500"
                                 : "bg-green-500"
                             }`}
-                            style={{ width: `${(agent.workload / 25) * 100}%` }}
+                            style={{ width: `${(agent.currentWorkload / 25) * 100}%` }}
                           ></div>
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
-                    {renderStars(agent.rating)}
+                    {renderStars(agent.averageRating)}
                   </td>
                 </tr>
               ))}

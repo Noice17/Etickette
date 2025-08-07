@@ -2,6 +2,7 @@ import React from "react";
 
 export interface Ticket {
   id: string;
+  title: string;
   description: string;
   category: string;
   requestedBy: string;
@@ -42,16 +43,21 @@ const TicketListView: React.FC<TicketListViewProps> = ({ tickets }) => {
               <h3 className="text-lg font-semibold text-azure-500">
                 {ticket.id}
               </h3>
-              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+              <span
+                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(
+                  ticket.priority
+                )}`}
+              >
                 {ticket.priority}
               </span>
             </div>
           </div>
 
-          <div className="mb-4">
-            <p className="text-gray-100 text-base leading-relaxed">
+          <div className="mb-4 text-gray-100 text-base leading-relaxed">
+            <div className="font-semibold">{ticket.title}</div>
+            <div className="truncate text-xs text-slate-400">
               {ticket.description}
-            </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">

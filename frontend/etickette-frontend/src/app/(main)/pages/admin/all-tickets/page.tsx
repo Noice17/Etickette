@@ -12,16 +12,13 @@ import toast from "react-hot-toast";
 interface Agent {
   id: number;
   username: string;
-  email: string;
-  role: string;
-  avatarUrl: string | null;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface Ticket {
   id: number;
+  title: string;
   description: string;
+  status: string; 
   priority: string;
   category: string;
   client?: { username: string };
@@ -66,11 +63,7 @@ export default function AllTickets() {
           .filter((user: any) => user.role === "AGENT")
           .map((user: any, index: number) => ({
             id: user.id,
-            email: user.email,
-            username: user.username,
-            unresolvedTickets: Math.floor(Math.random() * 20) + 5, // 5–25 dummy
-            workload: Math.floor(Math.random() * 26), // 0–25 dummy
-            rating: +(Math.random() * 1.5 + 3.5).toFixed(1), // 3.5–5.0 dummy
+            username: user.username
           }));
 
         setAgents(agentUsers);
@@ -92,6 +85,7 @@ export default function AllTickets() {
 
   const transformedTickets = tickets.map((ticket) => ({
     id: `TKT-${ticket.id.toString().padStart(3, "0")}`,
+    title: ticket.title,
     description: ticket.description,
     category: ticket.category.replace(/_/g, " "),
     requestedBy: ticket.client?.username || "Unknown",
