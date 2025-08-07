@@ -7,8 +7,10 @@ import com.sts.Etickette.repository.AgentRepository;
 import com.sts.Etickette.service.AgentService;
 import com.sts.Etickette.exception.ResourceNotFoundException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AgentServiceImpl implements AgentService {
@@ -41,40 +43,24 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public AgentDTO addRating(Long agentId, int rating) {
-        Agent agent = agentRepository.findById(agentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Agent not found"));
-
-        agent.getRating().add(rating);
-        agentRepository.save(agent);
-
-        return agentMapper.toDTO(agent);
+    public List<AgentDTO> getAllAgents() {
+        List<Agent> agents = agentRepository.findAll();
+        return agents.stream()
+                .map(AgentMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
 
     @Override
-    public AgentDTO incrementWorkload(Long agentId) {
+    public AgentDTO incrementWorkload(Long agentId, int increment) {
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Agent not found with ID: " + agentId));
 
-        if (agent.getCurrentWorkload() >= agent.getMaxWorkload()) {
-            throw new IllegalStateException("Agent has reached maximum workload.");
+        if (agent.getCurrentWorkload() + increment > agent.getMaxWorkload()) {
+            throw new IllegalStateException("Agent will exceed maximum workload.");
         }
 
-        agent.setCurrentWorkload(agent.getCurrentWorkload() + 1);
-        return AgentMapper.toDTO(agentRepository.save(agent));
-    }
-
-    @Override
-    public AgentDTO decrementWorkload(Long agentId) {
-        Agent agent = agentRepository.findById(agentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Agent not found with ID: " + agentId));
-
-        if (agent.getCurrentWorkload() <= 0) {
-            throw new IllegalStateException("Agent's workload is already zero.");
-        }
-
-        agent.setCurrentWorkload(agent.getCurrentWorkload() - 1);
+        agent.setCurrentWorkload(agent.getCurrentWorkload() + increment);
         return AgentMapper.toDTO(agentRepository.save(agent));
     }
 

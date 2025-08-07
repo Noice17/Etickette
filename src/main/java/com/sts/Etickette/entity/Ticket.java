@@ -41,6 +41,9 @@ public class Ticket {
     @JoinColumn(name="agent_id", nullable = true)
     private Agent agent;
 
+    @Column(name="rating", nullable = true)
+    private Integer rating;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable=false, name="priority")
     private Priority priority;
@@ -73,7 +76,7 @@ public class Ticket {
 
     public Ticket() {}
 
-    public Ticket(Long id, String title, String description, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime resolvedAt, User client, Agent agent, Priority priority, Status status, Category category) {
+    public Ticket(Long id, String title, String description, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime resolvedAt, User client, Agent agent, Integer rating, Priority priority, Status status, Category category) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -82,6 +85,7 @@ public class Ticket {
         this.resolvedAt = resolvedAt;
         this.client = client;
         this.agent = agent;
+        this.rating = rating;
         this.priority = priority;
         this.status = status;
         this.category = category;
@@ -149,6 +153,14 @@ public class Ticket {
 
     public void setAgent(Agent agent) {
         this.agent = agent;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
     }
 
     public Priority getPriority() {

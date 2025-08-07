@@ -4,6 +4,7 @@ import com.sts.Etickette.DTO.TicketDTO;
 import com.sts.Etickette.entity.Agent;
 import com.sts.Etickette.entity.Ticket;
 import com.sts.Etickette.entity.User;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,8 +13,8 @@ import java.util.Optional;
 
 public interface TicketService {
     TicketDTO createTicket(TicketDTO dto);
-    void updateTicket(Long id, TicketDTO dto);
-    void deleteTicket(Long id);
+    void updateTicket(Long id, TicketDTO dto, Authentication authentication);
+    void deleteTicket(Long id, Authentication authentication);
     List<TicketDTO> getTicketByClient(User client);
     List<TicketDTO> getTicketByAgent(Agent agent);
     List<TicketDTO> getTicketByTitle(String title);
@@ -30,4 +31,5 @@ public interface TicketService {
     long getTotalTicketsResolved();
     Map<Ticket.Status, Long> getTicketCountByStatus();
     Map<Long, Double> getAverageResolutionTimePerAgent();
+    void rateAgent(Long ticketId, int rating, Authentication authentication);
 }

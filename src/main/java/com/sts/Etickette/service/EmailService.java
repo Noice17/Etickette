@@ -24,13 +24,12 @@ public class EmailService {
     public void sendHtmlEmail(String to, String subject, String htmlContent) {
         try {
             MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true); // true = multipart
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            helper.setFrom("your_email@gmail.com"); // must match spring.mail.username
+            helper.setFrom("your_email@gmail.com");
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setText(htmlContent, true); // true = enable HTML
-
+            helper.setText(htmlContent, true);
             emailSender.send(message);
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to send email: " + e.getMessage());

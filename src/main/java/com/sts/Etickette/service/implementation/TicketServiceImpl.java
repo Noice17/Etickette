@@ -8,8 +8,10 @@ import com.sts.Etickette.mapper.TicketMapper;
 import com.sts.Etickette.repository.AgentRepository;
 import com.sts.Etickette.repository.TicketRepository;
 import com.sts.Etickette.repository.UserRepository;
+import com.sts.Etickette.service.EmailService;
 import com.sts.Etickette.service.TicketService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -25,11 +27,13 @@ public class TicketServiceImpl implements TicketService {
     private final TicketRepository ticketRepository;
     private final AgentRepository agentRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
-    public TicketServiceImpl(TicketRepository ticketRepository, AgentRepository agentRepository, UserRepository userRepository) {
+    public TicketServiceImpl(TicketRepository ticketRepository, AgentRepository agentRepository, UserRepository userRepository, EmailService emailService) {
         this.ticketRepository = ticketRepository;
         this.agentRepository = agentRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     private static final Map<Ticket.Category, Ticket.Priority> CATEGORY_PRIORITY_MAP = Map.of(
@@ -43,13 +47,13 @@ public class TicketServiceImpl implements TicketService {
     );
 
     private int getPriorityWeight(Ticket.Priority priority) {
-        switch (priority) {
-            case CRITICAL: return 8;
-            case HIGH:     return 5;
-            case MEDIUM:   return 3;
-            case LOW:      return 1;
-            default:       return 0;
-        }
+        return switch (priority) {
+            case CRITICAL -> 8;
+            case HIGH -> 5;
+            case MEDIUM -> 3;
+            case LOW -> 1;
+            default -> 0;
+        };
     }
 
     private Optional<Agent> findAvailableAgent(int workloadIncrement) {
@@ -78,12 +82,9 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketDTO createTicket(TicketDTO dto) {
-        // Map category to priority
         Ticket.Category category = dto.getCategory();
         Ticket.Priority mappedPriority = CATEGORY_PRIORITY_MAP.getOrDefault(category, Ticket.Priority.LOW);
-        dto.setPriority(mappedPriority);
 
-        // Assign agent if available
         int workloadIncrement = getPriorityWeight(mappedPriority);
         Optional<Agent> agentOpt = findAvailableAgent(workloadIncrement);
 
@@ -98,36 +99,51 @@ public class TicketServiceImpl implements TicketService {
             dto.setStatus(Ticket.Status.QUEUED);
         }
 
-//        // ✅ Ensure client is fetched and set (this prevents 'client_id' NULL in DB)
-//        if (dto.getClient() == null || dto.getClient().getId() == null) {
-//            throw new RuntimeException("Client ID is required to create a ticket");
-//        }
-
         User client = userRepository.findById(dto.getClient().getId())
                 .orElseThrow(() -> new RuntimeException("Client not found"));
         dto.setClient(client);
 
-        // Convert to entity and save
         Ticket ticket = TicketMapper.toEntity(dto);
+        ticket.setPriority(mappedPriority);
         Ticket savedTicket = ticketRepository.save(ticket);
+
+        emailService.sendHtmlEmail(ticket.getClient().getEmail(),
+                "Ticket Created: " + ticket.getTitle(), "<p>Your ticket has been created with ID " + ticket.getId() + ".</p>");
 
         return TicketMapper.toDTO(savedTicket);
     }
 
 
     @Override
-    public void deleteTicket(Long id){
+    public void deleteTicket(Long id, Authentication authentication){
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
+        String currentUserEmail = authentication.getName();
+        Agent assignedAgent = ticket.getAgent();
+        if (assignedAgent == null || !assignedAgent.getUser().getEmail().equals(currentUserEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException("You are not authorized to delete this ticket");
+        }
         ticketRepository.deleteById(id);
     }
 
     @Override
-    public void updateTicket(Long id, TicketDTO dto){
+    public void updateTicket(Long id, TicketDTO dto, Authentication authentication){
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
+
+        String currentUserEmail = authentication.getName();
+        Agent assignedAgent = ticket.getAgent();
+        if (assignedAgent == null || !assignedAgent.getUser().getEmail().equals(currentUserEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException("You are not authorized to update this ticket");
+        }
         Ticket.Status oldStatus = ticket.getStatus();
         Ticket.Status newStatus = dto.getStatus();
 
-        if ((newStatus == Ticket.Status.RESOLVED || newStatus == Ticket.Status.CLOSED) &&
+        if (oldStatus == Ticket.Status.CLOSED) {
+            throw new IllegalStateException("Cannot update a closed ticket.");
+        }
+
+        if ((newStatus == Ticket.Status.RESOLVED) &&
                 (oldStatus != Ticket.Status.RESOLVED && oldStatus != Ticket.Status.CLOSED) &&
                 ticket.getAgent() != null) {
             Agent agent = ticket.getAgent();
@@ -140,10 +156,20 @@ public class TicketServiceImpl implements TicketService {
 
         ticket.setStatus(newStatus);
         ticket.setUpdatedAt(LocalDateTime.now());
-        if (newStatus == Ticket.Status.RESOLVED || newStatus == Ticket.Status.CLOSED) {
+        if (newStatus == Ticket.Status.RESOLVED) {
             ticket.setResolvedAt(LocalDateTime.now());
         }
         ticketRepository.save(ticket);
+
+        String statusMsg = "Ticket status updated to " + ticket.getStatus();
+        emailService.sendHtmlEmail(ticket.getClient().getEmail(),
+                "Status Update on Ticket #" + ticket.getId(),
+                "<p>" + statusMsg + "<p>");
+        if(ticket.getAgent() != null) {
+            emailService.sendHtmlEmail(ticket.getAgent().getUser().getEmail(),
+                    "Ticket #" + ticket.getId() + " Status Update",
+                    "<p>" + statusMsg + "</p>");
+        }
     }
 
     @Override
@@ -264,5 +290,35 @@ public class TicketServiceImpl implements TicketService {
                         t -> t.getAgent().getUserId(),
                         Collectors.averagingDouble(t -> Duration.between(t.getCreatedAt(), t.getResolvedAt()).toMinutes() / 60.0)
                 ));
+    }
+
+    @Override
+    public void rateAgent(Long ticketId, int rating, Authentication authentication){
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
+        Agent agent = ticket.getAgent();
+
+        if (!ticket.getStatus().equals(Ticket.Status.RESOLVED)){
+            throw new IllegalArgumentException("Ticket cannot be rated yet");
+        }
+
+        String currentUserEmail = authentication.getName();
+        if (!ticket.getClient().getEmail().equals(currentUserEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException("Only the ticket owner can rate the agent");
+        }
+
+        if (agent == null) throw new IllegalStateException("No agent assigned to this ticket");
+        if (ticket.getRating() != null) throw new IllegalStateException("Ticket already rated");
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
+
+        ticket.setStatus(Ticket.Status.CLOSED);
+
+        ticket.setRating(rating);
+        ticketRepository.save(ticket);
+
+        agent.addRating(rating);
+        agentRepository.save(agent);
     }
 }

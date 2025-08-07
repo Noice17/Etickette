@@ -19,15 +19,13 @@ public class TicketDTO {
     @NotNull(message = "Status is required")
     private Ticket.Status status;
 
-    @NotNull(message = "Priority is required")
-    private Ticket.Priority priority;
-
     @NotNull(message = "Category is required")
     private Ticket.Category category;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime resolvedAt;
+    private Integer rating;
 
     @NotNull(message = "Client is required")
     private User client;
@@ -35,16 +33,16 @@ public class TicketDTO {
 
     public TicketDTO() {}
 
-    public TicketDTO(Long id, String title, String description, Ticket.Status status, Ticket.Priority priority, Ticket.Category category, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime resolvedAt, User client, Agent agent) {
+    public TicketDTO(Long id, String title, String description, Ticket.Status status, Ticket.Category category, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime resolvedAt, Integer rating, User client, Agent agent) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
-        this.priority = priority;
         this.category = category;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.resolvedAt = resolvedAt;
+        this.rating = rating;
         this.client = client;
         this.agent = agent;
     }
@@ -81,14 +79,6 @@ public class TicketDTO {
         this.status = status;
     }
 
-    public Ticket.Priority getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Ticket.Priority priority) {
-        this.priority = priority;
-    }
-
     public Ticket.Category getCategory() {
         return category;
     }
@@ -119,6 +109,14 @@ public class TicketDTO {
 
     public void setResolvedAt(LocalDateTime resolvedAt) {
         this.resolvedAt = resolvedAt;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
     }
 
     public User getClient() {

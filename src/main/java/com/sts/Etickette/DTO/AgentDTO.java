@@ -1,26 +1,34 @@
 package com.sts.Etickette.DTO;
 
-import java.util.List;
-
 public class AgentDTO {
     private Long userId;
-    private int maxWorkload;
-    private int currentWorkload;
-    private List<Integer> rating;
-    private double averageRating = 0.0;
+    private String username;
+    private String email;
+    private Integer maxWorkload;
+    private Integer currentWorkload;
+    private Double averageRating = 0.0;
+    private Integer ratingCount = 0;
 
     public AgentDTO() {
     }
 
-    public AgentDTO(Long userId, int maxWorkload, int currentWorkload, List<Integer> rating, double averageRating) {
+    public AgentDTO(Long userId, Integer maxWorkload, Integer currentWorkload, Double averageRating, Integer ratingCount) {
         this.userId = userId;
         this.maxWorkload = maxWorkload;
         this.currentWorkload = currentWorkload;
-        this.rating = rating;
         this.averageRating = averageRating;
+        this.ratingCount = ratingCount;
     }
 
-
+    public AgentDTO(Long userId, String username, String email, Integer maxWorkload, Integer currentWorkload, Double averageRating, Integer ratingCount) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.maxWorkload = maxWorkload;
+        this.currentWorkload = currentWorkload;
+        this.averageRating = averageRating;
+        this.ratingCount = ratingCount;
+    }
 
     public Long getUserId() {
         return userId;
@@ -30,35 +38,51 @@ public class AgentDTO {
         this.userId = userId;
     }
 
-    public int getMaxWorkload() {
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Integer getMaxWorkload() {
         return maxWorkload;
     }
 
-    public void setMaxWorkload(int maxWorkload) {
+    public void setMaxWorkload(Integer maxWorkload) {
         this.maxWorkload = maxWorkload;
     }
 
-    public int getCurrentWorkload() {
+    public Integer getCurrentWorkload() {
         return currentWorkload;
     }
 
-    public void setCurrentWorkload(int currentWorkload) {
+    public void setCurrentWorkload(Integer currentWorkload) {
         this.currentWorkload = currentWorkload;
     }
 
-    public List<Integer> getRating() {
-        return rating;
-    }
-
-    public void setRating(List<Integer> rating) {
-        this.rating = rating;
-    }
-
-    public double getAverageRating() {
+    public Double getAverageRating() {
         return averageRating;
     }
 
-    public void setAverageRating(double averageRating) {
+    public void setAverageRating(Double averageRating) {
         this.averageRating = averageRating;
+    }
+
+    public Integer getRatingCount() {
+        return ratingCount;
+    }
+
+    public void setRatingCount(Integer ratingCount) {
+        this.ratingCount = ratingCount;
     }
 }
