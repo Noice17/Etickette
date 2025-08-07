@@ -47,13 +47,13 @@ public class TicketServiceImpl implements TicketService {
     );
 
     private int getPriorityWeight(Ticket.Priority priority) {
-        switch (priority) {
-            case CRITICAL: return 8;
-            case HIGH:     return 5;
-            case MEDIUM:   return 3;
-            case LOW:      return 1;
-            default:       return 0;
-        }
+        return switch (priority) {
+            case CRITICAL -> 8;
+            case HIGH -> 5;
+            case MEDIUM -> 3;
+            case LOW -> 1;
+            default -> 0;
+        };
     }
 
     private Optional<Agent> findAvailableAgent(int workloadIncrement) {
@@ -309,10 +309,6 @@ public class TicketServiceImpl implements TicketService {
 
         if (agent == null) throw new IllegalStateException("No agent assigned to this ticket");
         if (ticket.getRating() != null) throw new IllegalStateException("Ticket already rated");
-        if (rating < 1 || rating > 5) {
-            throw new IllegalArgumentException("Rating must be between 1 and 5");
-        }
-
         if (rating < 1 || rating > 5) {
             throw new IllegalArgumentException("Rating must be between 1 and 5");
         }
