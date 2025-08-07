@@ -12,7 +12,6 @@ public class AgentMapper {
         Agent agent = new Agent();
         agent.setMaxWorkload(dto.getMaxWorkload());
         agent.setCurrentWorkload(dto.getCurrentWorkload());
-        agent.setAverageRating(dto.getAverageRating());
         agent.setRatingCount(dto.getRatingCount());
         return agent;
     }
@@ -21,7 +20,6 @@ public class AgentMapper {
         Agent agent = new Agent();
         agent.setMaxWorkload(dto.getMaxWorkload());
         agent.setCurrentWorkload(dto.getCurrentWorkload());
-        agent.setAverageRating(dto.getAverageRating());
         agent.setRatingCount(dto.getRatingCount());
         agent.setUser(user);
         return agent;
@@ -30,10 +28,12 @@ public class AgentMapper {
     public static AgentDTO toDTO(Agent agent) {
         AgentDTO dto = new AgentDTO();
         dto.setUserId(agent.getUser().getId());
+        dto.setUsername(agent.getUser().getUsername());
+        dto.setEmail(agent.getUser().getEmail());
         dto.setMaxWorkload(agent.getMaxWorkload());
         dto.setCurrentWorkload(agent.getCurrentWorkload());
-        dto.setAverageRating(agent.getAverageRating());
         dto.setRatingCount(agent.getRatingCount());
+        dto.setAverageRating(agent.getAverageRating());
         return dto;
     }
 }

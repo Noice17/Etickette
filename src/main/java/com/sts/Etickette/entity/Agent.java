@@ -17,20 +17,20 @@ public class Agent {
     private User user;
 
     @Column(name = "max_workload", nullable = false)
-    private int maxWorkload = 25;
+    private Integer maxWorkload = 25;
 
     @Column(name = "current_workload", nullable = false)
-    private int currentWorkload = 0;
+    private Integer currentWorkload = 0;
 
-    @Column(name = "average_rating")
-    private double averageRating = 0.0;
+    @Column(name = "average_rating", nullable = false)
+    private Double averageRating = 0.0;
 
-    @Column(name = "rating_count")
-    private int ratingCount = 0;
+    @Column(name = "rating_count", nullable = false)
+    private Integer ratingCount = 0;
 
     public Agent() {}
 
-    public Agent(User user, int maxWorkload, int currentWorkload, double averageRating, int ratingCount) {
+    public Agent(User user, Integer maxWorkload, Integer currentWorkload, Double averageRating, Integer ratingCount) {
         this.user = user;
         this.maxWorkload = maxWorkload;
         this.currentWorkload = currentWorkload;
@@ -54,41 +54,45 @@ public class Agent {
         this.user = user;
     }
 
-    public int getMaxWorkload() {
+    public Integer getMaxWorkload() {
         return maxWorkload;
     }
 
-    public void setMaxWorkload(int maxWorkload) {
+    public void setMaxWorkload(Integer maxWorkload) {
         this.maxWorkload = maxWorkload;
     }
 
-    public int getCurrentWorkload() {
+    public Integer getCurrentWorkload() {
         return currentWorkload;
     }
 
-    public void setCurrentWorkload(int currentWorkload) {
+    public void setCurrentWorkload(Integer currentWorkload) {
         this.currentWorkload = currentWorkload;
     }
 
-    public double getAverageRating() {
+    public Double getAverageRating() {
         return averageRating;
     }
 
-    public void setAverageRating(double averageRating) {
+    public void setAverageRating(Double averageRating) {
         this.averageRating = averageRating;
     }
 
-    public int getRatingCount() {
+    public Integer getRatingCount() {
         return ratingCount;
     }
 
-    public void setRatingCount(int ratingCount) {
+    public void setRatingCount(Integer ratingCount) {
         this.ratingCount = ratingCount;
     }
 
-    public void addRating(int newRating) {
+    public void addRating(Integer newRating) {
+        if (this.ratingCount == null) this.ratingCount = 0;
+        if (this.averageRating == null) this.averageRating = 0.0;
+
         double totalRating = this.averageRating * this.ratingCount;
         this.ratingCount++;
         this.averageRating = (totalRating + newRating) / this.ratingCount;
     }
+
 }

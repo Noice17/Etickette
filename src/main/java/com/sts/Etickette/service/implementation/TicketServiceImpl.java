@@ -309,6 +309,9 @@ public class TicketServiceImpl implements TicketService {
 
         if (agent == null) throw new IllegalStateException("No agent assigned to this ticket");
         if (ticket.getRating() != null) throw new IllegalStateException("Ticket already rated");
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
 
         if (rating < 1 || rating > 5) {
             throw new IllegalArgumentException("Rating must be between 1 and 5");
