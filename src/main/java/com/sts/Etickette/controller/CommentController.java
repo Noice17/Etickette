@@ -36,7 +36,7 @@ public class CommentController {
     }
 
     @GetMapping("/ticket/{ticketId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('CLIENT', 'AGENT', 'ADMIN')")
     public ResponseEntity<List<CommentDTO>> getCommentsByTicket(@PathVariable Long ticketId) {
         Optional<Ticket> ticketOpt = ticketService.getTicketEntityById(ticketId);
         if (ticketOpt.isEmpty()) {

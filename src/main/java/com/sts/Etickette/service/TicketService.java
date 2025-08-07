@@ -30,4 +30,5 @@ public interface TicketService {
     long getTotalTicketsResolved();
     Map<Ticket.Status, Long> getTicketCountByStatus();
     Map<Long, Double> getAverageResolutionTimePerAgent();
+    void rateAgent(Long ticketId, int rating);
 }

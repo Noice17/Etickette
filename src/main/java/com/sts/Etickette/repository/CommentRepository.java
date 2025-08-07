@@ -13,4 +13,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByMessage(String message);
     List<Comment> findByTicket(Ticket ticket);
     List<Comment> findByUser(User user);
+    List<Comment> findByTicketOrderByCreatedAtAsc(Ticket ticket);
 }

@@ -197,4 +197,17 @@ public class TicketController {
     public Map<Long, Double> getAverageResolutionTimePerAgent() {
         return ticketService.getAverageResolutionTimePerAgent();
     }
+
+    @PutMapping("/{ticketId}/rate")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<?> rateAgent(
+            @PathVariable Long ticketId,
+            @RequestParam int rating) {
+        try {
+            ticketService.rateAgent(ticketId, rating);
+            return ResponseEntity.ok("Rating submitted!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }

@@ -17,6 +17,7 @@ public class TicketMapper {
         dto.setCreatedAt(ticket.getCreatedAt());
         dto.setUpdatedAt(ticket.getUpdatedAt());
         dto.setResolvedAt(ticket.getResolvedAt());
+        dto.setRating(ticket.getRating());
         dto.setClient(ticket.getClient());
         dto.setAgent(ticket.getAgent());
         return dto;
@@ -34,6 +35,7 @@ public class TicketMapper {
         ticket.setCreatedAt(dto.getCreatedAt());
         ticket.setUpdatedAt(dto.getUpdatedAt());
         ticket.setResolvedAt(dto.getResolvedAt());
+        ticket.setRating(dto.getRating());
         ticket.setClient(dto.getClient());
         ticket.setAgent(dto.getAgent());
         return ticket;

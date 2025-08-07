@@ -8,6 +8,7 @@ import com.sts.Etickette.mapper.TicketMapper;
 import com.sts.Etickette.repository.AgentRepository;
 import com.sts.Etickette.repository.TicketRepository;
 import com.sts.Etickette.repository.UserRepository;
+import com.sts.Etickette.service.EmailService;
 import com.sts.Etickette.service.TicketService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -25,11 +26,13 @@ public class TicketServiceImpl implements TicketService {
     private final TicketRepository ticketRepository;
     private final AgentRepository agentRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
-    public TicketServiceImpl(TicketRepository ticketRepository, AgentRepository agentRepository, UserRepository userRepository) {
+    public TicketServiceImpl(TicketRepository ticketRepository, AgentRepository agentRepository, UserRepository userRepository, EmailService emailService) {
         this.ticketRepository = ticketRepository;
         this.agentRepository = agentRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     private static final Map<Ticket.Category, Ticket.Priority> CATEGORY_PRIORITY_MAP = Map.of(
@@ -78,12 +81,10 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketDTO createTicket(TicketDTO dto) {
-        // Map category to priority
         Ticket.Category category = dto.getCategory();
         Ticket.Priority mappedPriority = CATEGORY_PRIORITY_MAP.getOrDefault(category, Ticket.Priority.LOW);
         dto.setPriority(mappedPriority);
 
-        // Assign agent if available
         int workloadIncrement = getPriorityWeight(mappedPriority);
         Optional<Agent> agentOpt = findAvailableAgent(workloadIncrement);
 
@@ -98,18 +99,15 @@ public class TicketServiceImpl implements TicketService {
             dto.setStatus(Ticket.Status.QUEUED);
         }
 
-//        // ✅ Ensure client is fetched and set (this prevents 'client_id' NULL in DB)
-//        if (dto.getClient() == null || dto.getClient().getId() == null) {
-//            throw new RuntimeException("Client ID is required to create a ticket");
-//        }
-
         User client = userRepository.findById(dto.getClient().getId())
                 .orElseThrow(() -> new RuntimeException("Client not found"));
         dto.setClient(client);
 
-        // Convert to entity and save
         Ticket ticket = TicketMapper.toEntity(dto);
         Ticket savedTicket = ticketRepository.save(ticket);
+
+        emailService.sendHtmlEmail(ticket.getClient().getEmail(),
+                "Ticket Created: " + ticket.getTitle(), "<p>Your ticket has been created with ID " + ticket.getId() + ".</p>");
 
         return TicketMapper.toDTO(savedTicket);
     }
@@ -144,6 +142,16 @@ public class TicketServiceImpl implements TicketService {
             ticket.setResolvedAt(LocalDateTime.now());
         }
         ticketRepository.save(ticket);
+
+        String statusMsg = "Ticket status updated to " + ticket.getStatus();
+        emailService.sendHtmlEmail(ticket.getClient().getEmail(),
+                "Status Update on Ticket #" + ticket.getId(),
+                "<p>" + statusMsg + "<p>");
+        if(ticket.getAgent() != null) {
+            emailService.sendHtmlEmail(ticket.getAgent().getUser().getEmail(),
+                    "Ticket #" + ticket.getId() + " Status Update",
+                    "<p>" + statusMsg + "</p>");
+        }
     }
 
     @Override
@@ -264,5 +272,21 @@ public class TicketServiceImpl implements TicketService {
                         t -> t.getAgent().getUserId(),
                         Collectors.averagingDouble(t -> Duration.between(t.getCreatedAt(), t.getResolvedAt()).toMinutes() / 60.0)
                 ));
+    }
+
+    @Override
+    public void rateAgent(Long ticketId, int rating){
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
+        Agent agent = ticket.getAgent();
+
+        if (agent == null) throw new IllegalStateException("No agent assigned to this ticket");
+        if (ticket.getRating() != null) throw new IllegalStateException("Ticket already rated");
+
+        ticket.setRating(rating);
+        ticketRepository.save(ticket);
+
+        agent.addRating(rating);
+        agentRepository.save(agent);
     }
 }
