@@ -45,6 +45,10 @@ public class PdfReportService {
             document.add(new Paragraph(String.format("%.2f", ticketService.getAverageResolutionTimeHours()), valueFont));
             document.add(Chunk.NEWLINE);
 
+            document.add(new Paragraph("Average Rating of all Agents: ", labelFont));
+            document.add(new Paragraph(String.format("%.2f", ticketService.getAverageRatings()), valueFont));
+            document.add(Chunk.NEWLINE);
+
             document.add(new Paragraph("Total Tickets Created: ", labelFont));
             document.add(new Paragraph(String.valueOf(ticketService.getTotalTicketsCreated()), valueFont));
             document.add(Chunk.NEWLINE);
