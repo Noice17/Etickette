@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface TicketService {
     TicketDTO createTicket(TicketDTO dto);
     void updateTicket(Long id, TicketDTO dto, Authentication authentication);
-    void deleteTicket(Long id);
+    void deleteTicket(Long id, Authentication authentication);
     List<TicketDTO> getTicketByClient(User client);
     List<TicketDTO> getTicketByAgent(Agent agent);
     List<TicketDTO> getTicketByTitle(String title);

@@ -115,7 +115,14 @@ public class TicketServiceImpl implements TicketService {
 
 
     @Override
-    public void deleteTicket(Long id){
+    public void deleteTicket(Long id, Authentication authentication){
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
+        String currentUserEmail = authentication.getName();
+        Agent assignedAgent = ticket.getAgent();
+        if (assignedAgent == null || !assignedAgent.getUser().getEmail().equals(currentUserEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException("You are not authorized to delete this ticket");
+        }
         ticketRepository.deleteById(id);
     }
 
@@ -132,7 +139,11 @@ public class TicketServiceImpl implements TicketService {
         Ticket.Status oldStatus = ticket.getStatus();
         Ticket.Status newStatus = dto.getStatus();
 
-        if ((newStatus == Ticket.Status.RESOLVED || newStatus == Ticket.Status.CLOSED) &&
+        if (oldStatus == Ticket.Status.CLOSED) {
+            throw new IllegalStateException("Cannot update a closed ticket.");
+        }
+
+        if ((newStatus == Ticket.Status.RESOLVED) &&
                 (oldStatus != Ticket.Status.RESOLVED && oldStatus != Ticket.Status.CLOSED) &&
                 ticket.getAgent() != null) {
             Agent agent = ticket.getAgent();
@@ -145,7 +156,7 @@ public class TicketServiceImpl implements TicketService {
 
         ticket.setStatus(newStatus);
         ticket.setUpdatedAt(LocalDateTime.now());
-        if (newStatus == Ticket.Status.RESOLVED || newStatus == Ticket.Status.CLOSED) {
+        if (newStatus == Ticket.Status.RESOLVED) {
             ticket.setResolvedAt(LocalDateTime.now());
         }
         ticketRepository.save(ticket);
@@ -287,6 +298,10 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
         Agent agent = ticket.getAgent();
 
+        if (!ticket.getStatus().equals(Ticket.Status.RESOLVED)){
+            throw new IllegalArgumentException("Ticket cannot be rated yet");
+        }
+
         String currentUserEmail = authentication.getName();
         if (!ticket.getClient().getEmail().equals(currentUserEmail)) {
             throw new org.springframework.security.access.AccessDeniedException("Only the ticket owner can rate the agent");
@@ -294,6 +309,12 @@ public class TicketServiceImpl implements TicketService {
 
         if (agent == null) throw new IllegalStateException("No agent assigned to this ticket");
         if (ticket.getRating() != null) throw new IllegalStateException("Ticket already rated");
+
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
+
+        ticket.setStatus(Ticket.Status.CLOSED);
 
         ticket.setRating(rating);
         ticketRepository.save(ticket);

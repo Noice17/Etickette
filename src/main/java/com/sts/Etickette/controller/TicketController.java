@@ -79,12 +79,14 @@ public class TicketController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<?> deleteTicket(@PathVariable Long id) {
+    public ResponseEntity<?> deleteTicket(@PathVariable Long id, Authentication authentication) {
         try {
-            ticketService.deleteTicket(id);
+            ticketService.deleteTicket(id, authentication);
             return ResponseEntity.noContent().build();
         } catch (EmptyResultDataAccessException | EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ticket not found.");
+        } catch (org.springframework.security.access.AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this ticket.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not delete ticket: " + e.getMessage());
         }
