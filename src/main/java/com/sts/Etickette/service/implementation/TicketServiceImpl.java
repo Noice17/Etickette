@@ -63,7 +63,13 @@ public class TicketServiceImpl implements TicketService {
     }
 
     private void assignQueuedTickets() {
-        List<Ticket> queuedTickets = ticketRepository.findByStatusOrderByCreatedAtAsc(Ticket.Status.QUEUED);
+        List<Ticket> queuedTickets = ticketRepository.findByStatus(Ticket.Status.QUEUED)
+                .stream()
+                .sorted(
+                        Comparator.comparingInt((Ticket t) -> getPriorityWeight(t.getPriority())).reversed()
+                                .thenComparing(Ticket::getCreatedAt)
+                )
+                .toList();
         for (Ticket queued : queuedTickets) {
             Ticket.Priority priority = queued.getPriority();
             int workloadIncrement = getPriorityWeight(priority);
@@ -257,7 +263,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public double getAverageResolutionTimeHours() {
-        List<Ticket> resolvedTickets = ticketRepository.findByStatus(Ticket.Status.RESOLVED);
+        List<Ticket> resolvedTickets = ticketRepository.findByStatusIn(List.of(Ticket.Status.RESOLVED, Ticket.Status.CLOSED));
         return resolvedTickets.stream()
                 .filter(t -> t.getCreatedAt() != null && t.getResolvedAt() != null)
                 .mapToDouble(t -> Duration.between(t.getCreatedAt(), t.getResolvedAt()).toMinutes() / 60.0)
@@ -272,7 +278,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public long getTotalTicketsResolved() {
-        return ticketRepository.findByStatus(Ticket.Status.RESOLVED).size();
+        return ticketRepository.findByStatusIn(List.of(Ticket.Status.RESOLVED, Ticket.Status.CLOSED)).size();
     }
 
     @Override
@@ -283,7 +289,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Map<Long, Double> getAverageResolutionTimePerAgent() {
-        List<Ticket> resolvedTickets = ticketRepository.findByStatus(Ticket.Status.RESOLVED);
+        List<Ticket> resolvedTickets = ticketRepository.findByStatusIn(List.of(Ticket.Status.RESOLVED, Ticket.Status.CLOSED));
         return resolvedTickets.stream()
                 .filter(t -> t.getAgent() != null && t.getCreatedAt() != null && t.getResolvedAt() != null)
                 .collect(Collectors.groupingBy(
