@@ -10,6 +10,7 @@ import ResolutionTimeChart from "../components/dashboard/ResolutionTimeChart";
 import PriorityTicketChart from "../components/dashboard/PriorityTicketChart";
 import { apiFetch } from "@/utils/apiFetch";
 import toast from "react-hot-toast";
+import Banner from "../components/Banner";
 
 type User = {
   id: number;
@@ -55,25 +56,8 @@ export default function Home() {
   return (
     <div className="p-6 space-y-6">
       {/* Hero Banner */}
-      <div className="relative h-48 bg-slate-600 rounded-2xl overflow-hidden">
-        
-        <div className="relative h-full flex items-center justify-center">
-          <div className="text-center text-white">
-            <h1 className="text-3xl font-bold mb-2">Welcome to Etickette</h1>
-            <p className="text-lg opacity-90">
-              Your comprehensive ticketing dashboard
-            </p>
-            {user && (
-              <div className="mt-4 text-white text-sm">
-                <p><strong>Username:</strong> {user.username}</p>
-                <p><strong>Email:</strong> {user.email}</p>
-                <p><strong>Role:</strong> {user.role}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
+      <Banner user={user}/>
+      
       {/* Metrics Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
