@@ -19,6 +19,8 @@ public class TicketDTO {
     @NotNull(message = "Status is required")
     private Ticket.Status status;
 
+    private Ticket.Priority priority;
+
     @NotNull(message = "Category is required")
     private Ticket.Category category;
 
@@ -33,11 +35,12 @@ public class TicketDTO {
 
     public TicketDTO() {}
 
-    public TicketDTO(Long id, String title, String description, Ticket.Status status, Ticket.Category category, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime resolvedAt, Integer rating, User client, Agent agent) {
+    public TicketDTO(Long id, String title, String description, Ticket.Status status, Ticket.Priority priority, Ticket.Category category, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime resolvedAt, Integer rating, User client, Agent agent) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
+        this.priority = priority;
         this.category = category;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -77,6 +80,14 @@ public class TicketDTO {
 
     public void setStatus(Ticket.Status status) {
         this.status = status;
+    }
+
+    public Ticket.Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Ticket.Priority priority) {
+        this.priority = priority;
     }
 
     public Ticket.Category getCategory() {
