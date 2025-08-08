@@ -93,6 +93,7 @@ export default function AllTickets() {
     priority:
       ticket.priority.charAt(0).toUpperCase() +
       ticket.priority.slice(1).toLowerCase(),
+    status: ticket.status
   }));
 
   const uniqueAgents = [

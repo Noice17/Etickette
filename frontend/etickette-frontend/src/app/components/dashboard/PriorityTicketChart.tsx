@@ -2,32 +2,17 @@
 
 import { ResponsiveBar } from "@nivo/bar";
 
-const data = [
-  {
-    priority: "Low",
-    total: 20,
-    resolved: 15,
-  },
-  {
-    priority: "Medium",
-    total: 35,
-    resolved: 30,
-  },
-  {
-    priority: "High",
-    total: 25,
-    resolved: 20,
-  },
-  {
-    priority: "Critical",
-    total: 10,
-    resolved: 5,
-  },
-];
+interface ChartProps {
+  data: {
+    priority: string;
+    resolved: number;
+    unresolved: number;
+  }[];
+}
 
-const keys = ["resolved", "total"];
+const keys = ["resolved", "unresolved"];
 
-export default function PriorityTicketChart() {
+export default function PriorityTicketChart({ data }: ChartProps) {
   return (
     <div className="bg-slate-700 p-6 rounded-xl text-white h-[400px]">
       <div className="flex items-center justify-between mb-6">
@@ -45,6 +30,8 @@ export default function PriorityTicketChart() {
         labelSkipWidth={12}
         labelSkipHeight={12}
         labelTextColor="#ffffff"
+        enableLabel={true}
+        label={(d) => d.value != null && d.value > 1 ? String(d.value) : ""}
         theme={{
           axis: {
             ticks: {
@@ -87,6 +74,8 @@ export default function PriorityTicketChart() {
           legend: "Tickets",
           legendPosition: "middle",
           legendOffset: -40,
+          format: (value) => Math.floor(value),
+          tickValues: 3,
         }}
         legends={[
           {

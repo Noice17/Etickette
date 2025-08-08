@@ -1,6 +1,7 @@
 package com.sts.Etickette.controller;
 
 import com.sts.Etickette.service.PdfReportService;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,8 @@ public class ReportController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "tickets_report.pdf");
+//        headers.setContentDispositionFormData("attachment", "tickets_report.pdf");
+        headers.setContentDisposition(ContentDisposition.inline().filename("tickets_report.pdf").build());
 
         return ResponseEntity.ok()
                 .headers(headers)

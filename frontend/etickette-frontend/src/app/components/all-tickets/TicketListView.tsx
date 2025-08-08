@@ -8,6 +8,7 @@ export interface Ticket {
   requestedBy: string;
   assignedTo: string;
   priority: string;
+  status: string;
 }
 
 interface TicketListViewProps {
@@ -30,6 +31,21 @@ const TicketListView: React.FC<TicketListViewProps> = ({ tickets }) => {
         return "bg-gray-100/75 text-gray-700";
     }
   };
+
+  const getStatusColor = (status: string) => {
+    switch (status){
+      case "OPEN":
+        return "bg-blue-300/75 text-blue-700";
+      case "IN_PROGRESS":
+        return "bg-yellow-300/75 text-yellow-700";
+      case "RESOLVED":
+        return "bg-green-300/75 text-green-700";
+      case "CLOSED":
+        return "bg-gray-300/75 text-gray-700";
+      default:
+        return "bg-purple-300/75 text-purple-700";
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -60,7 +76,7 @@ const TicketListView: React.FC<TicketListViewProps> = ({ tickets }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
             <div>
               <span className="text-gray-400 uppercase tracking-wide text-xs font-medium">
                 Category
@@ -81,10 +97,19 @@ const TicketListView: React.FC<TicketListViewProps> = ({ tickets }) => {
               </span>
               <p className="text-gray-100 mt-1">{ticket.assignedTo}</p>
             </div>
+
+            <div className="">
+              <span className="text-gray-400 uppercase tracking-wide text-xs font-medium">
+                Status
+              </span>
+              <div>
+                <p className={`inline-flex text-gray-100 mt-1 p-1 text-xs font-semibold rounded-full ${getStatusColor(ticket.status)}`}>{ticket.status}</p>
+              </div>
+              
+            </div>
           </div>
         </div>
       ))}
-
       {tickets.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-400 text-lg">No tickets found</p>

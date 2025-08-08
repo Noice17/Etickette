@@ -8,6 +8,7 @@ export interface Ticket {
   requestedBy: string;
   assignedTo: string;
   priority: string;
+  status: string;
 }
 
 interface TicketTableViewProps {
@@ -30,6 +31,21 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
         return "bg-gray-100/75 text-gray-700";
     }
   };
+
+  const getStatusColor = (status: string) => {
+    switch (status){
+      case "OPEN":
+        return "bg-blue-300/75 text-blue-700";
+      case "IN_PROGRESS":
+        return "bg-yellow-300/75 text-yellow-700";
+      case "RESOLVED":
+        return "bg-green-300/75 text-green-700";
+      case "CLOSED":
+        return "bg-gray-300/75 text-gray-700";
+      default:
+        return "bg-purple-300/75 text-purple-700";
+    }
+  }
 
   return (
     <div className="rounded-lg overflow-hidden">
@@ -55,6 +71,9 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
               <th className="px-6 py-3 tracking-wider">
                 Priority
               </th>
+              <th className="px-6 py-3 tracking-wider">
+                Status
+              </th>
             </tr>
           </thead>
           <tbody className="bg-slate-600 divide-y divide-slate-800">
@@ -79,6 +98,11 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
                     {ticket.priority}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                    {ticket.status}
                   </span>
                 </td>
               </tr>

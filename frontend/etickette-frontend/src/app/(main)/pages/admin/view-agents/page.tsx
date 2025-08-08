@@ -187,10 +187,12 @@ export default function ViewAgents() {
             <div>
               <p className="text-gray-400 text-sm">Avg Workload</p>
               <p className="text-white text-xl font-semibold">
-                {(
-                  agents.reduce((sum, agent) => sum + agent.currentWorkload, 0) /
-                  agents.length
-                ).toFixed(1)}
+                {loading
+                ? 'Loading...'
+                : agents.length > 0
+                  ? (agents.reduce((sum, agent) => sum + agent.currentWorkload, 0) / agents.length).toFixed(1)
+                  : 0
+                }
               </p>
             </div>
           </div>

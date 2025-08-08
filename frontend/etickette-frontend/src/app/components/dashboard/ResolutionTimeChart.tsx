@@ -1,7 +1,7 @@
 "use client";
 
-import { ResponsiveLine } from '@nivo/line';
-import { useEffect, useState } from 'react';
+import { ResponsiveLine } from "@nivo/line";
+import { useEffect, useState } from "react";
 
 type ResolutionDataPoint = {
   x: string; // "Aug 1", "Aug 2", ...
@@ -20,7 +20,10 @@ const generateDummyData = (): LineChartData[] => {
   for (let day = 1; day <= 30; day++) {
     const baseTime = 4 + Math.sin(day / 5) * 1.5;
     const randomVariation = (Math.random() - 0.5) * 2;
-    const resolutionTime = Math.max(1, Math.round((baseTime + randomVariation) * 10) / 10);
+    const resolutionTime = Math.max(
+      1,
+      Math.round((baseTime + randomVariation) * 10) / 10
+    );
 
     data.push({
       x: `Aug ${day}`,
@@ -30,34 +33,32 @@ const generateDummyData = (): LineChartData[] => {
 
   return [
     {
-      id: 'Resolution Time',
+      id: "Resolution Time",
       data,
     },
   ];
 };
 
-export default function ResolutionTimeChart() {
-  const [data, setData] = useState<LineChartData[]>([]);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setData(generateDummyData());
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
+export default function ResolutionTimeChart({
+  data,
+}: {
+  data: LineChartData[];
+}) {
+  if (!data || data.length === 0) {
     return (
       <div className="bg-slate-700 p-6 rounded-xl text-white">
         <h3 className="text-lg font-semibold mb-4">Average Resolution Time</h3>
         <div className="h-64 flex items-center justify-center text-slate-400">
-          Loading chart...
+          No data available.
         </div>
       </div>
     );
   }
 
-  const allValues = data[0].data.map(d => d.y);
-  const average = (allValues.reduce((sum, val) => sum + val, 0) / allValues.length).toFixed(1);
+  const allValues = data[0].data.map((d) => d.y);
+  const average = (
+    allValues.reduce((sum, val) => sum + val, 0) / allValues.length
+  ).toFixed(1);
   const min = Math.min(...allValues).toFixed(1);
   const max = Math.max(...allValues).toFixed(1);
 
@@ -72,11 +73,11 @@ export default function ResolutionTimeChart() {
         <ResponsiveLine
           data={data}
           margin={{ top: 20, right: 20, bottom: 50, left: 50 }}
-          xScale={{ type: 'point' }}
+          xScale={{ type: "point" }}
           yScale={{
-            type: 'linear',
-            min: 'auto',
-            max: 'auto',
+            type: "linear",
+            min: "auto",
+            max: "auto",
             stacked: false,
             reverse: false,
           }}
@@ -86,52 +87,52 @@ export default function ResolutionTimeChart() {
             tickSize: 5,
             tickPadding: 5,
             tickRotation: -45,
-            legend: 'Day',
+            legend: "Day",
             legendOffset: 36,
-            legendPosition: 'middle',
+            legendPosition: "middle",
           }}
           axisLeft={{
             tickSize: 5,
             tickPadding: 5,
-            legend: 'Hours',
+            legend: "Hours",
             legendOffset: -40,
-            legendPosition: 'middle',
+            legendPosition: "middle",
           }}
-          colors={{ scheme: 'category10' }}
+          colors={{ scheme: "category10" }}
           pointSize={6}
-          pointColor={{ theme: 'background' }}
+          pointColor={{ theme: "background" }}
           pointBorderWidth={2}
-          pointBorderColor={{ from: 'serieColor' }}
+          pointBorderColor={{ from: "serieColor" }}
           pointLabelYOffset={-12}
           useMesh={true}
           enableGridX={false}
           theme={{
             text: {
-              fill: '#ffffff',
+              fill: "#ffffff",
             },
             axis: {
               ticks: {
                 text: {
-                  fill: '#94a3b8',
+                  fill: "#94a3b8",
                   fontSize: 7,
                 },
               },
               legend: {
                 text: {
-                  fill: '#94a3b8',
+                  fill: "#94a3b8",
                 },
               },
             },
             grid: {
               line: {
-                stroke: '#475569',
+                stroke: "#475569",
                 strokeWidth: 1,
               },
             },
             tooltip: {
               container: {
-                background: '#1e293b',
-                color: '#f8fafc',
+                background: "#1e293b",
+                color: "#f8fafc",
                 fontSize: 12,
               },
             },

@@ -8,6 +8,7 @@ export interface Ticket {
   requestedBy: string;
   assignedTo: string;
   priority: string;
+  status: string;
 }
 
 interface TicketKanbanViewProps {
@@ -23,13 +24,13 @@ const TicketKanbanView: React.FC<TicketKanbanViewProps> = ({ tickets }) => {
       headerColor: "bg-green-600 border-green-500",
     },
     {
-      name: "Medium", 
+      name: "Medium",
       color: "bg-yellow-500/75 text-yellow-700",
       headerColor: "bg-yellow-600 border-yellow-500",
     },
     {
       name: "High",
-      color: "bg-orange-300/75 text-orange-700", 
+      color: "bg-orange-300/75 text-orange-700",
       headerColor: "bg-orange-500 border-orange-300",
     },
     {
@@ -41,7 +42,7 @@ const TicketKanbanView: React.FC<TicketKanbanViewProps> = ({ tickets }) => {
 
   // Filter tickets by priority
   const getTicketsByPriority = (priority: string) => {
-    return tickets.filter(ticket => ticket.priority === priority);
+    return tickets.filter((ticket) => ticket.priority === priority);
   };
 
   // Priority color mapping for badges
@@ -60,17 +61,34 @@ const TicketKanbanView: React.FC<TicketKanbanViewProps> = ({ tickets }) => {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "OPEN":
+        return "bg-blue-300/75 text-blue-700";
+      case "IN_PROGRESS":
+        return "bg-yellow-300/75 text-yellow-700";
+      case "RESOLVED":
+        return "bg-green-300/75 text-green-700";
+      case "CLOSED":
+        return "bg-gray-300/75 text-gray-700";
+      default:
+        return "bg-purple-300/75 text-purple-700";
+    }
+  };
+
   return (
     <div className="h-full">
       {/* Kanban Board */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 h-full">
         {priorities.map((priority) => {
           const columnTickets = getTicketsByPriority(priority.name);
-          
+
           return (
             <div key={priority.name} className="flex flex-col h-full">
               {/* Column Header */}
-              <div className={`${priority.headerColor} rounded-t-lg px-4 py-3 border-b-2`}>
+              <div
+                className={`${priority.headerColor} rounded-t-lg px-4 py-3 border-b-2`}
+              >
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-white text-sm uppercase tracking-wide">
                     {priority.name}
@@ -91,10 +109,17 @@ const TicketKanbanView: React.FC<TicketKanbanViewProps> = ({ tickets }) => {
                     >
                       {/* Card Header */}
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-azure-500 font-semibold text-sm">
-                          {ticket.id}
-                        </span>
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                        <div className="flex gap-2">
+                          <span className="text-azure-500 font-semibold text-sm">
+                            {ticket.id}
+                          </span>
+                        </div>
+
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(
+                            ticket.priority
+                          )}`}
+                        >
                           {ticket.priority}
                         </span>
                       </div>
@@ -113,21 +138,34 @@ const TicketKanbanView: React.FC<TicketKanbanViewProps> = ({ tickets }) => {
                         <span className="text-gray-400 text-xs uppercase tracking-wide">
                           Category
                         </span>
-                        <p className="text-gray-100 text-sm">{ticket.category}</p>
+                        <p className="text-gray-100 text-sm">
+                          {ticket.category}
+                        </p>
                       </div>
 
                       {/* Footer */}
                       <div className="border-t border-slate-500 pt-3 space-y-2">
-                        <div className="flex justify-between text-xs">
-                          <div>
+                        <div className="flex text-xs justify-between">
+                          <div className="flex justify-between items-center">
                             <span className="text-gray-400">Requested:</span>
-                            <span className="text-gray-100 ml-1">{ticket.requestedBy}</span>
+                            <span className="text-gray-100 ml-1">
+                              {ticket.requestedBy}
+                            </span>
                           </div>
+                          <span
+                            className={`inline-flex p-1 text-[8px] font-semibold rounded-full ${getStatusColor(
+                              ticket.status
+                            )}`}
+                          >
+                            {ticket.status}
+                          </span>
                         </div>
                         <div className="flex justify-between text-xs">
                           <div>
                             <span className="text-gray-400">Assigned:</span>
-                            <span className="text-gray-100 ml-1">{ticket.assignedTo}</span>
+                            <span className="text-gray-100 ml-1">
+                              {ticket.assignedTo}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -137,7 +175,9 @@ const TicketKanbanView: React.FC<TicketKanbanViewProps> = ({ tickets }) => {
                   {/* Empty State */}
                   {columnTickets.length === 0 && (
                     <div className="text-center py-8">
-                      <p className="text-gray-400 text-sm">No {priority.name.toLowerCase()} priority tickets</p>
+                      <p className="text-gray-400 text-sm">
+                        No {priority.name.toLowerCase()} priority tickets
+                      </p>
                     </div>
                   )}
                 </div>
