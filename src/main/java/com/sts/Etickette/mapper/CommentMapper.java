@@ -11,8 +11,8 @@ public class CommentMapper {
         dto.setId(comment.getId());
         dto.setMessage(comment.getMessage());
         dto.setCreatedAt(comment.getCreatedAt());
-        dto.setTicketId(comment.getTicket() != null ? comment.getTicket().getId() : null);
-        dto.setUserId(comment.getUser() != null ? comment.getUser().getId() : null);
+        dto.setTicket(comment.getTicket());
+        dto.setUser(comment.getUser());
         return dto;
     }
 
@@ -22,6 +22,8 @@ public class CommentMapper {
         comment.setId(dto.getId());
         comment.setMessage(dto.getMessage());
         comment.setCreatedAt(dto.getCreatedAt());
+        comment.setTicket(dto.getTicket());
+        comment.setUser(dto.getUser());
         return comment;
     }
 }
