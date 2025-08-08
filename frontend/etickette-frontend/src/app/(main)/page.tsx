@@ -16,6 +16,8 @@ import PriorityTicketChart from "../components/dashboard/PriorityTicketChart";
 import { apiFetch } from "@/utils/apiFetch";
 import toast from "react-hot-toast";
 import Banner from "../components/Banner";
+import AddAgentModal from "../components/dashboard/AddAgentModal";
+import ConfirmGeneratePDFModal from "../components/dashboard/ConfirmGeneratePDFModal";
 
 type User = {
   id: number;
@@ -46,29 +48,12 @@ export default function Home() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [priorityData, setPriorityData] = useState<any[]>([]);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isReportModalOpen, setReportModalOpen] = useState(false);
 
   const [avgResolutionTime, setAvgResolutionTime] =
     useState<string>("Loading...");
   const [avgRating, setAvgRating] = useState<number | null>(0);
-
-
-  const handleGeneratePDF = async () =>{
-    try{
-      const res = await apiFetch("/reports/metrics", {method: "GET",})
-      if (!res.ok){
-        throw new Error("Failed to generate PDF")
-      }
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      window.open(url, "_blank");
-      
-      setTimeout(() => window.URL.revokeObjectURL(url), 1000)
-    }catch(error){
-      toast.error("Error generating PDF");
-      console.error("Error generating PDF: ", error);
-    }
-  }
-  
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -158,7 +143,7 @@ export default function Home() {
         const data: Agent[] = await res.json();
         setAgents(data);
 
-        const ratedAgents = data.filter(agent => agent.averageRating > 0);
+        const ratedAgents = data.filter((agent) => agent.averageRating > 0);
 
         if (ratedAgents.length > 0) {
           const totalRatings = data.reduce(
@@ -196,7 +181,7 @@ export default function Home() {
             </div>
           </div>
           <h3 className="text-2xl font-bold mb-1">{avgResolutionTime}</h3>
-          <p className="text-slate-300 text-sm">Ave Resolution Time</p>
+          <p className="text-slate-300 text-sm">Average Resolution Time</p>
         </div>
 
         {/* Total Ticket */}
@@ -220,22 +205,63 @@ export default function Home() {
           <h3 className="text-2xl font-bold mb-1">
             {avgRating !== null ? avgRating : "0"}
           </h3>
-          <p className="text-slate-300 text-sm">Ave Rating</p>
+          <p className="text-slate-300 text-sm">Average Rating</p>
         </div>
 
         {/* Controls */}
         <div className="bg-slate-700 p-6 rounded-xl flex flex-col justify-center items-center">
           <div className="flex mb-3 gap-2">
-            {/* Generate PDF */}
-            <button onClick={handleGeneratePDF} className="flex gap-2 items text-white bg-orange-500 p-2 hover:bg-orange-600 items-center justify-center rounded">
-              <FilePlus2 />
-            </button>
-            {/* Add New Agent */}
-            <button className="flex gap-2 items text-white bg-violet-500 p-2 hover:bg-violet-600 items-center justify-center rounded">
-              <UserPlus2 />
-            </button>
+            <div className="flex mb-3 gap-2">
+              {/* Generate PDF */}
+              <div className="relative group">
+                <button
+                  onClick={() => setReportModalOpen(true)}
+                  className="flex gap-2 text-white bg-orange-500 p-2 hover:bg-orange-600 items-center justify-center rounded"
+                >
+                  <FilePlus2 />
+                </button>
+                <span
+                  className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
+                     opacity-0 group-hover:opacity-100 
+                     transition bg-gray-800 text-white text-xs 
+                     px-2 py-1 rounded shadow-lg whitespace-nowrap"
+                >
+                  Generate PDF
+                </span>
+              </div>
+
+              {/* Add New Agent */}
+              <div className="relative group">
+                <button
+                  onClick={() => setModalOpen(true)}
+                  className="flex gap-2 text-white bg-violet-500 p-2 hover:bg-violet-600 items-center justify-center rounded"
+                >
+                  <UserPlus2 />
+                </button>
+                <span
+                  className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 
+                     opacity-0 group-hover:opacity-100 
+                     transition bg-gray-800 text-white text-xs 
+                     px-2 py-1 rounded shadow-lg whitespace-nowrap"
+                >
+                  Add New Agent
+                </span>
+              </div>
+            </div>
           </div>
           <h3 className="text-2xl font-bold text-white">Controls</h3>
+
+          <ConfirmGeneratePDFModal
+            isOpen={isReportModalOpen}
+            onClose={() => setReportModalOpen(false)}
+            onGeneratePDF={() => console.log("Report generated")}
+          />
+
+          <AddAgentModal
+            isOpen={isModalOpen}
+            onClose={() => setModalOpen(false)}
+            onAgentAdded={() => console.log("Agent added - refresh list")}
+          />
         </div>
       </div>
 

@@ -39,7 +39,7 @@ export default function Sidebar({ collapsed, toggleCollapsed }: Props) {
     >
       {/* Top section: Toggle + Nav */}
       <div>
-        <div className="h-16 flex items-center justify-end pr-5">
+        <div className="h-16 flex items-center justify-end pr-5 hover:bg-indigo-700">
           <button onClick={toggleCollapsed} className="cursor-pointer">
             <Menu />
           </button>
@@ -81,7 +81,7 @@ export default function Sidebar({ collapsed, toggleCollapsed }: Props) {
         <Link href="/login">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-5 py-3 hover:bg-indigo-700 rounded w-full text-left"
+            className="flex items-center gap-2 px-5 py-3 hover:bg-red-700 rounded w-full text-left"
           >
             <LogOut />
             {!collapsed && <span>Logout</span>}

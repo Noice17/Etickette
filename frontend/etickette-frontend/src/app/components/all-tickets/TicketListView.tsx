@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import Pagination from "../Pagination";
 
 export interface Ticket {
   id: string;
@@ -16,6 +17,15 @@ interface TicketListViewProps {
 }
 
 const TicketListView: React.FC<TicketListViewProps> = ({ tickets }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Slice tickets for current page
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentTickets = tickets.slice(startIndex, startIndex + itemsPerPage);
+
+  const totalPages = Math.ceil(tickets.length / itemsPerPage);
+
   // Priority color mapping
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -33,7 +43,7 @@ const TicketListView: React.FC<TicketListViewProps> = ({ tickets }) => {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status){
+    switch (status) {
       case "OPEN":
         return "bg-blue-300/75 text-blue-700";
       case "IN_PROGRESS":
@@ -45,11 +55,11 @@ const TicketListView: React.FC<TicketListViewProps> = ({ tickets }) => {
       default:
         return "bg-purple-300/75 text-purple-700";
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
-      {tickets.map((ticket) => (
+      {currentTickets.map((ticket) => (
         <div
           key={ticket.id}
           className="bg-slate-600 rounded-lg p-6 hover:bg-slate-700 transition-colors duration-150"
@@ -103,9 +113,14 @@ const TicketListView: React.FC<TicketListViewProps> = ({ tickets }) => {
                 Status
               </span>
               <div>
-                <p className={`inline-flex text-gray-100 mt-1 p-1 text-xs font-semibold rounded-full ${getStatusColor(ticket.status)}`}>{ticket.status}</p>
+                <p
+                  className={`inline-flex text-gray-100 mt-1 p-1 text-xs font-semibold rounded-full ${getStatusColor(
+                    ticket.status
+                  )}`}
+                >
+                  {ticket.status}
+                </p>
               </div>
-              
             </div>
           </div>
         </div>
@@ -115,6 +130,9 @@ const TicketListView: React.FC<TicketListViewProps> = ({ tickets }) => {
           <p className="text-gray-400 text-lg">No tickets found</p>
         </div>
       )}
+
+      {/* Pagination */}
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </div>
   );
 };

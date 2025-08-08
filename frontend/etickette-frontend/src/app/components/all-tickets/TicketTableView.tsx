@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import Pagination from "../Pagination";
 
 export interface Ticket {
   id: string;
@@ -16,6 +17,16 @@ interface TicketTableViewProps {
 }
 
 const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
+  const[currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage =  5;
+
+  // Slice tickets for current page
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentTickets = tickets.slice(startIndex, startIndex + itemsPerPage);
+
+  const totalPages = Math.ceil(tickets.length / itemsPerPage);
+
+
   // Priority color mapping
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -77,7 +88,7 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
             </tr>
           </thead>
           <tbody className="bg-slate-600 divide-y divide-slate-800">
-            {tickets.map((ticket) => (
+            {currentTickets.map((ticket) => (
               <tr key={ticket.id} className="hover:bg-gray-700">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-azure-500">
                   {ticket.id}
@@ -110,6 +121,8 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
           </tbody>
         </table>
       </div>
+      {/* Pagination */}
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </div>
   );
 };

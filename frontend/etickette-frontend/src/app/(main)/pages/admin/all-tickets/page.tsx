@@ -202,12 +202,6 @@ export default function AllTickets() {
           </select>
         </div>
       </div>
-
-      {/* Ticket Count */}
-      <div className="mb-4 text-sm text-azure-300">
-        Showing {filteredTickets.length} of {transformedTickets.length} tickets
-      </div>
-
       {viewMode === "table" && <TicketTableView tickets={filteredTickets} />}
       {viewMode === "kanban" && <TicketKanbanView tickets={filteredTickets} />}
       {viewMode === "list" && <TicketListView tickets={filteredTickets} />}
