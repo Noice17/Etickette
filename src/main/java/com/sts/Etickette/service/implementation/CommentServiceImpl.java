@@ -14,7 +14,6 @@ import com.sts.Etickette.service.EmailService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,10 +35,12 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDTO createComment(CommentDTO dto){
         Comment comment = CommentMapper.toEntity(dto);
+        comment.setMessage(dto.getMessage());
         comment.setCreatedAt(LocalDateTime.now());
-        Ticket ticket = ticketRepository.findById(dto.getTicket().getId())
+
+        Ticket ticket = ticketRepository.findById(dto.getTicketId())
                 .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
-        User commenter = userRepository.findById(dto.getUser().getId())
+        User commenter = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         comment.setTicket(ticket);
         comment.setUser(commenter);

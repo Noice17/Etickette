@@ -15,18 +15,20 @@ public class CommentDTO {
     private LocalDateTime createdAt;
 
     @NotNull(message = "Ticket is required")
-    private Ticket ticket;
+    private Long ticketId;
 
-    @NotNull(message = "User is required")
-    private User user;
+    @NotNull(message="User is required")
+    private Long userId;
+    private UserDTO user;
 
     public CommentDTO() {}
 
-    public CommentDTO(Long id, String message, LocalDateTime createdAt, Ticket ticket, User user) {
+    public CommentDTO(Long id, String message, LocalDateTime createdAt, Long ticketId, Long userId, UserDTO user) {
         this.id = id;
         this.message = message;
         this.createdAt = createdAt;
-        this.ticket = ticket;
+        this.ticketId = ticketId;
+        this.userId = userId;
         this.user = user;
     }
 
@@ -54,19 +56,27 @@ public class CommentDTO {
         this.createdAt = createdAt;
     }
 
-    public Ticket getTicket() {
-        return ticket;
+    public Long getTicketId() {
+        return ticketId;
     }
 
-    public void setTicket(Ticket ticket) {
-        this.ticket = ticket;
+    public void setTicketId(Long ticketId) {
+        this.ticketId = ticketId;
     }
 
-    public User getUser() {
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public UserDTO getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserDTO user) {
         this.user = user;
     }
 }
