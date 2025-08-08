@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Pagination from "../Pagination";
+import { SortAsc, SortDesc } from "lucide-react";
 
 export interface Ticket {
   id: string;
@@ -17,15 +18,39 @@ interface TicketTableViewProps {
 }
 
 const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
-  const[currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage =  5;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<keyof Ticket>("id");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const itemsPerPage = 5;
+
+  const sortedTickets = [...tickets].sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+
+    if (sortDirection === "asc") {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    } else {
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    }
+  });
+
+  const handleSort = (field: keyof Ticket) => {
+    if (field === sortField) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   // Slice tickets for current page
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentTickets = tickets.slice(startIndex, startIndex + itemsPerPage);
+  const currentTickets = sortedTickets.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   const totalPages = Math.ceil(tickets.length / itemsPerPage);
-
 
   // Priority color mapping
   const getPriorityColor = (priority: string) => {
@@ -44,7 +69,7 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status){
+    switch (status) {
       case "OPEN":
         return "bg-blue-300/75 text-blue-700";
       case "IN_PROGRESS":
@@ -56,7 +81,7 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
       default:
         return "bg-purple-300/75 text-purple-700";
     }
-  }
+  };
 
   return (
     <div className="rounded-lg overflow-hidden">
@@ -64,26 +89,100 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
         <table className="w-full">
           <thead className="bg-slate-700 font-semibold border-b border-b-slate-800">
             <tr className="text-left text-xs uppercase">
-              <th className="px-6 py-3 tracking-wider">
-                Ticket ID
+              <th
+                onClick={() => handleSort("id")}
+                className="px-6 py-3 tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  Ticket ID
+                  {sortField === "id" && (
+                    <span className="text-azure-400">
+                      {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                    </span>
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 tracking-wider">
-                Info
+              <th
+                onClick={() => handleSort("title")}
+                className="px-6 py-3 tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  Info
+                  {sortField === "title" && (
+                    <span className="text-azure-400">
+                      {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                    </span>
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 tracking-wider">
-                Category
+              <th
+                onClick={() => handleSort("category")}
+                className="px-6 py-3 tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  Category
+                  {sortField === "category" && (
+                    <span className="text-azure-400">
+                      {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                    </span>
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 tracking-wider">
-                Requested By
+              
+              <th
+                onClick={() => handleSort("requestedBy")}
+                className="px-6 py-3 tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  Requested By
+                  {sortField === "requestedBy" && (
+                    <span className="text-azure-400">
+                      {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                    </span>
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 tracking-wider">
-                Assigned To
+              
+              <th
+                onClick={() => handleSort("assignedTo")}
+                className="px-6 py-3 tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  Assigned To
+                  {sortField === "assignedTo" && (
+                    <span className="text-azure-400">
+                      {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                    </span>
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 tracking-wider">
-                Priority
+              
+              <th
+                onClick={() => handleSort("priority")}
+                className="px-6 py-3 tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  Priority
+                  {sortField === "priority" && (
+                    <span className="text-azure-400">
+                      {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                    </span>
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 tracking-wider">
-                Status
+              
+              <th
+                onClick={() => handleSort("status")}
+                className="px-6 py-3 tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  Status
+                  {sortField === "status" && (
+                    <span className="text-azure-400">
+                      {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                    </span>
+                  )}
+                </div>
               </th>
             </tr>
           </thead>
@@ -95,7 +194,9 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-100 max-w-md">
                   <div className="font-semibold">{ticket.title}</div>
-                  <div className="truncate text-[11px] text-slate-400">{ticket.description}</div>
+                  <div className="truncate text-[11px] text-slate-400">
+                    {ticket.description}
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-100 max-w-md">
                   {ticket.category}
@@ -107,12 +208,20 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
                   {ticket.assignedTo}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(ticket.priority)}`}>
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(
+                      ticket.priority
+                    )}`}
+                  >
                     {ticket.priority}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(ticket.status)}`}>
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                      ticket.status
+                    )}`}
+                  >
                     {ticket.status}
                   </span>
                 </td>
@@ -122,7 +231,11 @@ const TicketTableView: React.FC<TicketTableViewProps> = ({ tickets }) => {
         </table>
       </div>
       {/* Pagination */}
-      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };

@@ -11,13 +11,13 @@ import {
 // import ResolutionTimeChart from "../components/dashboard/ResolutionTimeChart";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ResolutionTimeChart from "../components/dashboard/ResolutionTimeChart";
 import PriorityTicketChart from "../components/dashboard/PriorityTicketChart";
 import { apiFetch } from "@/utils/apiFetch";
 import toast from "react-hot-toast";
 import Banner from "../components/Banner";
 import AddAgentModal from "../components/dashboard/AddAgentModal";
 import ConfirmGeneratePDFModal from "../components/dashboard/ConfirmGeneratePDFModal";
+import EticketteBanner from "../components/all-tickets/EticketteBanner";
 
 type User = {
   id: number;
@@ -34,6 +34,8 @@ interface Ticket {
   createdAt: string;
   resolvedAt: string | null;
   priority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  status: string;
+  agent?: { userId: number };
 }
 
 interface Agent {
@@ -50,10 +52,17 @@ export default function Home() {
   const [priorityData, setPriorityData] = useState<any[]>([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isReportModalOpen, setReportModalOpen] = useState(false);
-
+  const [topAgents, setTopAgents] = useState<Agent[]>([]);
   const [avgResolutionTime, setAvgResolutionTime] =
     useState<string>("Loading...");
   const [avgRating, setAvgRating] = useState<number | null>(0);
+
+  const priorityValues: Record<string, number> = {
+    LOW: 1,
+    MEDIUM: 3,
+    HIGH: 5,
+    CRITICAL: 8,
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -78,92 +87,164 @@ export default function Home() {
       }
     };
 
-    const fetchTickets = async () => {
+    // const fetchTickets = async () => {
+    //   try {
+    //     const res = await apiFetch("/tickets/all");
+    //     if (!res.ok) {
+    //       throw new Error("Failed to fetch tickets");
+    //     }
+    //     const data: Ticket[] = await res.json();
+    //     setTickets(data);
+
+    //     const resolvedTickets = data.filter(
+    //       (ticket: Ticket) => ticket.resolvedAt !== null
+    //     );
+
+    //     const totalResolutionTime = resolvedTickets.reduce(
+    //       (acc: number, ticket: Ticket) => {
+    //         const createdAt = new Date(ticket.createdAt).getTime();
+    //         const resolvedAt = new Date(ticket.resolvedAt!).getTime();
+    //         return acc + (resolvedAt - createdAt);
+    //       },
+    //       0
+    //     );
+    //     const avgTime =
+    //       resolvedTickets.length > 0
+    //         ? totalResolutionTime / resolvedTickets.length
+    //         : 0;
+
+    //     // Format: convert milliseconds to hours + minutes
+    //     const avgHours = Math.floor(avgTime / (1000 * 60 * 60));
+    //     const avgMinutes = Math.floor(
+    //       (avgTime % (1000 * 60 * 60)) / (1000 * 60)
+    //     );
+    //     const formatted = `${avgHours} hr ${avgMinutes} min`;
+    //     setAvgResolutionTime(formatted);
+
+    //     //Resolved vs Unresolved by Priority
+    //     const priorityLevels = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
+    //     const priorityCounts = priorityLevels.map((priority) => {
+    //       const ticketsByPriority = data.filter((t) => t.priority === priority);
+    //       const resolved = ticketsByPriority.filter(
+    //         (t) => t.resolvedAt !== null
+    //       ).length;
+    //       const unresolved = ticketsByPriority.length - resolved;
+
+    //       return {
+    //         priority,
+    //         resolved,
+    //         unresolved,
+    //       };
+    //     });
+    //     setPriorityData(priorityCounts);
+    //   } catch (error) {
+    //     toast.error("Error fetching tickets");
+    //     console.error("Error fetching tickets:", error);
+    //   }
+    // };
+
+    // const fetchAgents = async () => {
+    //   try {
+    //     const res = await apiFetch("/agents");
+    //     if (!res.ok) {
+    //       throw new Error("Failed to fetch agents");
+    //     }
+    //     const data: Agent[] = await res.json();
+    //     setAgents(data);
+
+    //     const ratedAgents = data.filter((agent) => agent.averageRating > 0);
+
+    //     if (ratedAgents.length > 0) {
+    //       const totalRatings = data.reduce(
+    //         (sum, agent) => sum + agent.averageRating,
+    //         0
+    //       );
+    //       const avgRating = totalRatings / ratedAgents.length;
+    //       setAvgRating(parseFloat(avgRating.toFixed(1)));
+    //     } else {
+    //       setAvgRating(0);
+    //     }
+    //   } catch (error) {
+    //     toast.error("Error fetching agents");
+    //     console.error("Error fetching agents:", error);
+    //   }
+    // };
+
+    const fetchData = async () => {
       try {
-        const res = await apiFetch("/tickets/all");
-        if (!res.ok) {
-          throw new Error("Failed to fetch tickets");
-        }
-        const data: Ticket[] = await res.json();
-        setTickets(data);
+        const [ticketsRes, agentsRes] = await Promise.all([
+          apiFetch("/tickets/all"),
+          apiFetch("/agents"),
+        ]);
 
-        const resolvedTickets = data.filter(
-          (ticket: Ticket) => ticket.resolvedAt !== null
-        );
+        if (!ticketsRes.ok) throw new Error("Failed to fetch tickets");
+        if (!agentsRes.ok) throw new Error("Failed to fetch agents");
 
-        const totalResolutionTime = resolvedTickets.reduce(
-          (acc: number, ticket: Ticket) => {
-            const createdAt = new Date(ticket.createdAt).getTime();
-            const resolvedAt = new Date(ticket.resolvedAt!).getTime();
-            return acc + (resolvedAt - createdAt);
-          },
-          0
+        const ticketData: Ticket[] = await ticketsRes.json();
+        const agentData: Agent[] = await agentsRes.json();
+
+        setTickets(ticketData);
+        setAgents(agentData);
+
+        // --- Average Resolution Time ---
+        const resolvedTickets = ticketData.filter(
+          (ticket) => ticket.resolvedAt !== null
         );
+        const totalResolutionTime = resolvedTickets.reduce((acc, ticket) => {
+          const createdAt = new Date(ticket.createdAt).getTime();
+          const resolvedAt = new Date(ticket.resolvedAt!).getTime();
+          return acc + (resolvedAt - createdAt);
+        }, 0);
+
         const avgTime =
           resolvedTickets.length > 0
             ? totalResolutionTime / resolvedTickets.length
             : 0;
 
-        // Format: convert milliseconds to hours + minutes
         const avgHours = Math.floor(avgTime / (1000 * 60 * 60));
         const avgMinutes = Math.floor(
           (avgTime % (1000 * 60 * 60)) / (1000 * 60)
         );
-        const formatted = `${avgHours} hr ${avgMinutes} min`;
-        setAvgResolutionTime(formatted);
+        setAvgResolutionTime(`${avgHours} hr ${avgMinutes} min`);
 
-        //Resolved vs Unresolved by Priority
+        // --- Resolved vs Unresolved by Priority ---
         const priorityLevels = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
         const priorityCounts = priorityLevels.map((priority) => {
-          const ticketsByPriority = data.filter((t) => t.priority === priority);
+          const ticketsByPriority = ticketData.filter(
+            (t) => t.priority === priority
+          );
           const resolved = ticketsByPriority.filter(
             (t) => t.resolvedAt !== null
           ).length;
           const unresolved = ticketsByPriority.length - resolved;
-
-          return {
-            priority,
-            resolved,
-            unresolved,
-          };
+          return { priority, resolved, unresolved };
         });
         setPriorityData(priorityCounts);
-      } catch (error) {
-        toast.error("Error fetching tickets");
-        console.error("Error fetching tickets:", error);
-      }
-    };
 
-    const fetchAgents = async () => {
-      try {
-        const res = await apiFetch("/agents");
-        if (!res.ok) {
-          throw new Error("Failed to fetch agents");
-        }
-        const data: Agent[] = await res.json();
-        setAgents(data);
-
-        const ratedAgents = data.filter((agent) => agent.averageRating > 0);
-
+        // --- Average Rating ---
+        const ratedAgents = agentData.filter(
+          (agent) => agent.averageRating > 0
+        );
         if (ratedAgents.length > 0) {
-          const totalRatings = data.reduce(
+          const totalRatings = agentData.reduce(
             (sum, agent) => sum + agent.averageRating,
             0
           );
-          const avgRating = totalRatings / ratedAgents.length;
-          setAvgRating(parseFloat(avgRating.toFixed(1)));
+          setAvgRating(
+            parseFloat((totalRatings / ratedAgents.length).toFixed(1))
+          );
         } else {
           setAvgRating(0);
         }
       } catch (error) {
-        toast.error("Error fetching agents");
-        console.error("Error fetching agents:", error);
+        toast.error("Error fetching dashboard data");
       }
     };
 
     fetchUser();
-    fetchTickets();
-    fetchAgents();
+    fetchData();
+    // fetchTickets();
+    // fetchAgents();
   }, []);
 
   return (
@@ -267,10 +348,11 @@ export default function Home() {
 
       {/* Bottom Row - Two Large Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* <ResolutionTimeChart data={resolutionChartData} /> */}
-
         {/* Priority Ticket Chart */}
         <PriorityTicketChart data={priorityData} />
+
+        {/* Etickette Banner */}
+        <EticketteBanner/>
       </div>
     </div>
   );
