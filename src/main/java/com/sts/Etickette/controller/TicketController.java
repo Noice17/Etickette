@@ -9,6 +9,7 @@ import com.sts.Etickette.repository.UserRepository;
 import com.sts.Etickette.service.TicketService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -235,5 +236,35 @@ public class TicketController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('CLIENT','AGENT','ADMIN')")
+    public ResponseEntity<List<TicketDTO>> searchTickets(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) Long clientId,
+            @RequestParam(required = false) Ticket.Status status,
+            @RequestParam(required = false) Long agentId,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdAt,
+            @RequestParam(required = false) String categoryPart
+    ) {
+        User client = clientId != null
+                ? userRepository.findById(clientId).orElse(null)
+                : null;
+        Agent agent = agentId != null
+                ? agentRepository.findById(agentId).orElse(null)
+                : null;
+
+        List<TicketDTO> results = ticketService.searchTickets(
+                title,
+                client,
+                status,
+                agent,
+                description,
+                createdAt,
+                categoryPart
+        );
+        return ResponseEntity.ok(results);
     }
 }
