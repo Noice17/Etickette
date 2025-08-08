@@ -32,6 +32,7 @@ public class ChatController {
     @Autowired
     private UserRepository userRepository;
 
+    @MessageMapping("/chat/{ticketId}")
     public void sendMessage(@DestinationVariable Long ticketId, MessageDTO messageDTO, Principal principal) {
         String userEmail = principal.getName();
         User sender = userRepository.findByEmail(userEmail)
