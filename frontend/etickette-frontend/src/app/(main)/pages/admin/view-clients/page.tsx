@@ -27,54 +27,55 @@ export default function ViewClients() {
   const [sortField, setSortField] = useState<keyof Client>("id");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  useEffect(() =>{
+  useEffect(() => {
     const fetchClients = async () => {
-      try{
+      try {
+        setLoading(true)
         const [clientsRes, ticketsRes] = await Promise.all([
           apiFetch("/users"),
-          apiFetch("/tickets/all")
-        ])
+          apiFetch("/tickets/all"),
+        ]);
 
-        if(!clientsRes.ok || !ticketsRes.ok){
-          throw new Error('Failed to fetch data')
+        if (!clientsRes.ok || !ticketsRes.ok) {
+          throw new Error("Failed to fetch data");
         }
 
         const clientsData = await clientsRes.json();
         const ticketsData = await ticketsRes.json();
 
         const clientUsers: Client[] = clientsData
-        .filter((user: any) => user.role === "CLIENT")
-        .map((client: any) => {
-          const liveTickets = ticketsData.filter(
-            (ticket: any) =>
-              ticket.client?.id === client.id && ticket.resolvedAt === null
-          ).length;
+          .filter((user: any) => user.role === "CLIENT")
+          .map((client: any) => {
+            const liveTickets = ticketsData.filter(
+              (ticket: any) =>
+                ticket.client?.id === client.id && ticket.resolvedAt === null
+            ).length;
 
-          const resolvedTickets = ticketsData.filter(
-            (ticket: any) =>
-              ticket.client?.id === client.id && ticket.resolvedAt !== null
-          ).length;
+            const resolvedTickets = ticketsData.filter(
+              (ticket: any) =>
+                ticket.client?.id === client.id && ticket.resolvedAt !== null
+            ).length;
 
-          return{
-            id: client.id,
-            name: client.username,
-            email: client.email,
-            liveTickets,
-            resolvedTickets
-          }
-        })
+            return {
+              id: client.id,
+              name: client.username,
+              email: client.email,
+              liveTickets,
+              resolvedTickets,
+            };
+          });
 
         setClients(clientUsers);
-
-      }catch (error){
+      } catch (error) {
         toast.error("Failed to load clients or tickets");
-        console.error("Error fetching agents or tickets:",error);
+        console.error("Error fetching agents or tickets:", error);
+      }finally{
+        setLoading(false)
       }
-    }
-    fetchClients()
-  },[])
-  
-  
+    };
+    fetchClients();
+  }, []);
+
   const sortedClients = [...clients].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
@@ -174,134 +175,140 @@ export default function ViewClients() {
       {/* Clients Table */}
       <div className="rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-700 border-b border-slate-800 text-azure-300 font-semibold">
-              <tr>
-                <th
-                  className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("id")}
-                >
-                  <div className="flex items-center gap-2">
-                    Client ID
-                    {sortField === "id" && (
-                      <span className="text-azure-400">
-                        {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("email")}
-                >
-                  <div className="flex items-center gap-2">
-                    Info
-                    {sortField === "email" && (
-                      <span className="text-azure-400">
-                        {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("liveTickets")}
-                >
-                  <div className="flex items-center gap-2">
-                    Live Tickets
-                    {sortField === "liveTickets" && (
-                      <span className="text-azure-400">
-                        {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("resolvedTickets")}
-                >
-                  <div className="flex items-center gap-2">
-                    Resolved Tickets
-                    {sortField === "resolvedTickets" && (
-                      <span className="text-azure-400">
-                        {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th className="px-6 py-3 text-left text-xs uppercase tracking-wider">
-                  Total Tickets
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-slate-600 divide-y divide-slate-800">
-              {sortedClients.map((client) => {
-                const totalTickets =
-                  client.liveTickets + client.resolvedTickets;
-                const resolutionRate =
-                  totalTickets > 0
-                    ? ((client.resolvedTickets / totalTickets) * 100).toFixed(1)
-                    : "0";
-
-                return (
-                  <tr
-                    key={client.id}
-                    className="hover:bg-gray-700 transition-colors"
+          {loading ? (
+            <p className="text-azure-300 font-bold text-lg">Loading...</p>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-slate-700 border-b border-slate-800 text-azure-300 font-semibold">
+                <tr>
+                  <th
+                    className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+                    onClick={() => handleSort("id")}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-azure-500">
-                      CLT-{client.id.toString().padStart(3, "0")}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
-                      <div className="flex items-center gap-2">
-                        <Mail size={16} className="text-gray-400" />
-                        <div>
-                          <div className="font-medium">{client.name}</div>
-                          <div className="text-gray-400 text-xs">
-                            {client.email}
+                    <div className="flex items-center gap-2">
+                      Client ID
+                      {sortField === "id" && (
+                        <span className="text-azure-400">
+                          {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+                    onClick={() => handleSort("email")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Info
+                      {sortField === "email" && (
+                        <span className="text-azure-400">
+                          {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+                    onClick={() => handleSort("liveTickets")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Live Tickets
+                      {sortField === "liveTickets" && (
+                        <span className="text-azure-400">
+                          {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+                    onClick={() => handleSort("resolvedTickets")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Resolved Tickets
+                      {sortField === "resolvedTickets" && (
+                        <span className="text-azure-400">
+                          {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs uppercase tracking-wider">
+                    Total Tickets
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-slate-600 divide-y divide-slate-800">
+                {sortedClients.map((client) => {
+                  const totalTickets =
+                    client.liveTickets + client.resolvedTickets;
+                  const resolutionRate =
+                    totalTickets > 0
+                      ? ((client.resolvedTickets / totalTickets) * 100).toFixed(
+                          1
+                        )
+                      : "0";
+
+                  return (
+                    <tr
+                      key={client.id}
+                      className="hover:bg-gray-700 transition-colors"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-azure-500">
+                        CLT-{client.id.toString().padStart(3, "0")}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                        <div className="flex items-center gap-2">
+                          <Mail size={16} className="text-gray-400" />
+                          <div>
+                            <div className="font-medium">{client.name}</div>
+                            <div className="text-gray-400 text-xs">
+                              {client.email}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
-                      <div className="flex items-center gap-2">
-                        <Clock
-                          size={16}
-                          className={
-                            client.liveTickets > 3
-                              ? "text-red-400"
-                              : client.liveTickets > 1
-                              ? "text-orange-400"
-                              : client.liveTickets > 0
-                              ? "text-yellow-400"
-                              : "text-green-400"
-                          }
-                        />
-                        <span className="font-medium">
-                          {client.liveTickets}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle size={16} className="text-green-400" />
-                        <span className="font-medium">
-                          {client.resolvedTickets}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
-                      <div className="flex flex-col">
-                        <span className="font-medium">{totalTickets}</span>
-                        <span className="text-xs text-gray-400">
-                          {resolutionRate}% resolved
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                        <div className="flex items-center gap-2">
+                          <Clock
+                            size={16}
+                            className={
+                              client.liveTickets > 3
+                                ? "text-red-400"
+                                : client.liveTickets > 1
+                                ? "text-orange-400"
+                                : client.liveTickets > 0
+                                ? "text-yellow-400"
+                                : "text-green-400"
+                            }
+                          />
+                          <span className="font-medium">
+                            {client.liveTickets}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle size={16} className="text-green-400" />
+                          <span className="font-medium">
+                            {client.resolvedTickets}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                        <div className="flex flex-col">
+                          <span className="font-medium">{totalTickets}</span>
+                          <span className="text-xs text-gray-400">
+                            {resolutionRate}% resolved
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

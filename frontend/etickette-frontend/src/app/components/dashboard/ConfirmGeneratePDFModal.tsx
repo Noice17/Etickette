@@ -28,6 +28,7 @@ export default function ConfirmGeneratePDFModal({
   if (!show) return null;
 
   const handleGeneratePDF = async () => {
+    setLoading(true);
     try {
       const res = await apiFetch("/reports/metrics", { method: "GET" });
       if (!res.ok) {
@@ -41,6 +42,8 @@ export default function ConfirmGeneratePDFModal({
     } catch (error) {
       toast.error("Error generating PDF");
       console.error("Error generating PDF: ", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,7 +83,9 @@ export default function ConfirmGeneratePDFModal({
           <button
             onClick={handleGeneratePDF}
             disabled={loading}
-            className="px-4 py-2 bg-violet-500 text-white rounded hover:bg-violet-600"
+            className={`px-4 py-2 bg-violet-500 text-white rounded hover:bg-violet-600 flex items-center gap-2 ${
+              loading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
             {loading ? "Generating..." : "Generate"}
           </button>

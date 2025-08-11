@@ -188,11 +188,15 @@ export default function ViewAgents() {
               <p className="text-gray-400 text-sm">Avg Workload</p>
               <p className="text-white text-xl font-semibold">
                 {loading
-                ? 'Loading...'
-                : agents.length > 0
-                  ? (agents.reduce((sum, agent) => sum + agent.currentWorkload, 0) / agents.length).toFixed(1)
-                  : 0
-                }
+                  ? "0"
+                  : agents.length > 0
+                  ? (
+                      agents.reduce(
+                        (sum, agent) => sum + agent.currentWorkload,
+                        0
+                      ) / agents.length
+                    ).toFixed(1)
+                  : 0}
               </p>
             </div>
           </div>
@@ -214,152 +218,158 @@ export default function ViewAgents() {
       {/* Agents Table */}
       <div className="rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-700 border-b border-slate-800 text-azure-300  font-semibold">
-              <tr>
-                <th
-                  className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("userId")}
-                >
-                  <div className="flex items-center gap-2">
-                    ID
-                    {sortField === "userId" && (
-                      <span className="text-azure-400">
-                        {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("email")}
-                >
-                  <div className="flex items-center gap-2">
-                    Info
-                    {sortField === "email" && (
-                      <span className="text-azure-400">
-                        {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("unresolvedTickets")}
-                >
-                  <div className="flex items-center gap-2">
-                    Unresolved Tickets
-                    {sortField === "unresolvedTickets" && (
-                      <span className="text-azure-400">
-                        {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("currentWorkload")}
-                >
-                  <div className="flex items-center gap-2">
-                    Workload
-                    {sortField === "currentWorkload" && (
-                      <span className="text-azure-400">
-                        {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
-                  onClick={() => handleSort("averageRating")}
-                >
-                  <div className="flex items-center gap-2">
-                    Rating
-                    {sortField === "averageRating" && (
-                      <span className="text-azure-400">
-                        {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
-                      </span>
-                    )}
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-slate-600 divide-y divide-slate-800">
-              {sortedAgents.map((agent) => (
-                <tr
-                  key={agent.userId}
-                  className="hover:bg-gray-700 transition-colors"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-azure-500">
-                    AGT-{agent.userId.toString().padStart(3, "0")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+          {loading ? (
+            <p className="text-azure-300 font-bold text-lg">Loading...</p>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-slate-700 border-b border-slate-800 text-azure-300  font-semibold">
+                <tr>
+                  <th
+                    className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+                    onClick={() => handleSort("userId")}
+                  >
                     <div className="flex items-center gap-2">
-                      <Mail size={16} className="text-gray-400" />
-                      <div>
-                        <div className="font-medium">{agent.username}</div>
-                        <div className="text-gray-400 text-xs">
-                          {agent.email}
-                        </div>
-                      </div>
+                      ID
+                      {sortField === "userId" && (
+                        <span className="text-azure-400">
+                          {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                        </span>
+                      )}
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+                    onClick={() => handleSort("email")}
+                  >
                     <div className="flex items-center gap-2">
-                      <AlertCircle
-                        size={16}
-                        className={
-                          agent.unresolvedTickets > 15
-                            ? "text-red-400"
-                            : agent.unresolvedTickets > 10
-                            ? "text-orange-400"
-                            : "text-green-400"
-                        }
-                      />
-                      <span className="font-medium">
-                        {agent.unresolvedTickets}
-                      </span>
+                      Info
+                      {sortField === "email" && (
+                        <span className="text-azure-400">
+                          {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                        </span>
+                      )}
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-gray-100 text-sm font-medium">
-                            {agent.currentWorkload}/25
-                          </span>
-                          <span
-                            className={`text-xs font-semibold px-2 py-1 rounded-full ${getWorkloadColor(
-                              agent.currentWorkload
-                            )}`}
-                          >
-                            {getWorkloadCategory(agent.currentWorkload)}
-                          </span>
-                        </div>
-                        <div className="w-full bg-slate-700 rounded-full h-2">
-                          <div
-                            className={`h-2 rounded-full ${
-                              agent.currentWorkload >= 20
-                                ? "bg-red-500"
-                                : agent.currentWorkload >= 15
-                                ? "bg-orange-500"
-                                : agent.currentWorkload >= 8
-                                ? "bg-yellow-500"
-                                : "bg-green-500"
-                            }`}
-                            style={{ width: `${(agent.currentWorkload / 25) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+                    onClick={() => handleSort("unresolvedTickets")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Unresolved Tickets
+                      {sortField === "unresolvedTickets" && (
+                        <span className="text-azure-400">
+                          {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                        </span>
+                      )}
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
-                    {renderStars(agent.averageRating)}
-                  </td>
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+                    onClick={() => handleSort("currentWorkload")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Workload
+                      {sortField === "currentWorkload" && (
+                        <span className="text-azure-400">
+                          {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs uppercase tracking-wider cursor-pointer hover:bg-slate-600 transition-colors"
+                    onClick={() => handleSort("averageRating")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Rating
+                      {sortField === "averageRating" && (
+                        <span className="text-azure-400">
+                          {sortDirection === "asc" ? <SortAsc /> : <SortDesc />}
+                        </span>
+                      )}
+                    </div>
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-slate-600 divide-y divide-slate-800">
+                {sortedAgents.map((agent) => (
+                  <tr
+                    key={agent.userId}
+                    className="hover:bg-gray-700 transition-colors"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-azure-500">
+                      AGT-{agent.userId.toString().padStart(3, "0")}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                      <div className="flex items-center gap-2">
+                        <Mail size={16} className="text-gray-400" />
+                        <div>
+                          <div className="font-medium">{agent.username}</div>
+                          <div className="text-gray-400 text-xs">
+                            {agent.email}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle
+                          size={16}
+                          className={
+                            agent.unresolvedTickets > 15
+                              ? "text-red-400"
+                              : agent.unresolvedTickets > 10
+                              ? "text-orange-400"
+                              : "text-green-400"
+                          }
+                        />
+                        <span className="font-medium">
+                          {agent.unresolvedTickets}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-gray-100 text-sm font-medium">
+                              {agent.currentWorkload}/25
+                            </span>
+                            <span
+                              className={`text-xs font-semibold px-2 py-1 rounded-full ${getWorkloadColor(
+                                agent.currentWorkload
+                              )}`}
+                            >
+                              {getWorkloadCategory(agent.currentWorkload)}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-700 rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full ${
+                                agent.currentWorkload >= 20
+                                  ? "bg-red-500"
+                                  : agent.currentWorkload >= 15
+                                  ? "bg-orange-500"
+                                  : agent.currentWorkload >= 8
+                                  ? "bg-yellow-500"
+                                  : "bg-green-500"
+                              }`}
+                              style={{
+                                width: `${(agent.currentWorkload / 25) * 100}%`,
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                      {renderStars(agent.averageRating)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
