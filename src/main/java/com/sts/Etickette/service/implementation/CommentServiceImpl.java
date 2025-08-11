@@ -7,8 +7,11 @@ import com.sts.Etickette.entity.Ticket;
 import com.sts.Etickette.entity.User;
 import com.sts.Etickette.mapper.CommentMapper;
 import com.sts.Etickette.repository.CommentRepository;
+import com.sts.Etickette.repository.TicketRepository;
+import com.sts.Etickette.repository.UserRepository;
 import com.sts.Etickette.service.CommentService;
 import com.sts.Etickette.service.EmailService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,22 +22,38 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final EmailService emailService;
+    private final TicketRepository ticketRepository;
+    private final UserRepository userRepository;
 
-    public CommentServiceImpl(CommentRepository commentRepository, EmailService emailService) {
+    public CommentServiceImpl(CommentRepository commentRepository, EmailService emailService, TicketRepository ticketRepository, UserRepository userRepository) {
         this.commentRepository = commentRepository;
         this.emailService = emailService;
+        this.ticketRepository = ticketRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public CommentDTO createComment(CommentDTO dto){
         Comment comment = CommentMapper.toEntity(dto);
+        comment.setMessage(dto.getMessage());
         comment.setCreatedAt(LocalDateTime.now());
-        Comment saved = commentRepository.save(comment);
-        Ticket ticket = comment.getTicket();
-        User commenter = comment.getUser();
+
+        Ticket ticket = ticketRepository.findById(dto.getTicketId())
+                .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
+        User commenter = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        comment.setTicket(ticket);
+        comment.setUser(commenter);
+
         User client = ticket.getClient();
         Agent agent = ticket.getAgent();
         User agentUser = agent != null ? agent.getUser() : null;
+
+        boolean isAgent = agentUser != null && commenter.getId().equals(agentUser.getId());
+        boolean isClient = client != null && commenter.getId().equals(client.getId());
+        if (!isAgent && !isClient) {
+            throw new org.springframework.security.access.AccessDeniedException("User is not assigned to this ticket.");
+        }
 
         if (agentUser != null && !commenter.getId().equals(agentUser.getId())){
             emailService.sendHtmlEmail(agentUser.getEmail(),
@@ -47,6 +66,8 @@ public class CommentServiceImpl implements CommentService {
                     "New comment on Ticket #" + ticket.getId(),
                     "<p>Agent commented: " + comment.getMessage() + "</p>");
         }
+
+        Comment saved = commentRepository.save(comment);
         return CommentMapper.toDTO(saved);
     }
 

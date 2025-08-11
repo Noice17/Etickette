@@ -36,4 +36,11 @@ public interface TicketService {
     Map<Long, Double> getAverageResolutionTimePerAgent();
     Map<Long, Long> getResolvedTicketCountPerAgent();
     void rateAgent(Long ticketId, int rating, Authentication authentication);
+    List<TicketDTO> searchTickets(String title,
+                                  User client,
+                                  Ticket.Status status,
+                                  Agent agent,
+                                  String description,
+                                  LocalDateTime createdAt,
+                                  String categoryPart);
 }

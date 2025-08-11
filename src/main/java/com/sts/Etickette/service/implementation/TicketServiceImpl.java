@@ -357,4 +357,17 @@ public class TicketServiceImpl implements TicketService {
         agent.addRating(rating);
         agentRepository.save(agent);
     }
+
+    @Override
+    public List<TicketDTO> searchTickets(String title,
+                                         User client,
+                                         Ticket.Status status,
+                                         Agent agent,
+                                         String description,
+                                         LocalDateTime createdAt,
+                                         String categoryPart){
+        return ticketRepository.findByTitleAndClientAndStatusAndAgentAndDescriptionAndCreatedAtAndCategoryContainingIgnoreCase(
+                title, client, status, agent, description, createdAt, categoryPart
+        ).stream().map(TicketMapper::toDTO).collect(Collectors.toList());
+    }
 }
