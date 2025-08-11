@@ -45,8 +45,25 @@ export default function LoginPage() {
       }
 
       localStorage.setItem("token", token);
-      router.push("/");
-      toast.success("Login successful!")
+
+      const userRes = await apiFetch("/users/me", { method: "GET" });
+      if (!userRes.ok) {
+        throw new Error("Failed to fetch user info");
+      }
+      const user = await userRes.json();
+      localStorage.setItem("role", user.role);
+      localStorage.setItem("id", user.id);
+
+      if(user.role === "CLIENT"){
+        router.push("/pages/client")
+      }else if (user.role === "AGENT"){
+        router.push("/pages/agent")
+      }else{
+        router.push("/");
+      }
+
+      // router.push("/");
+      toast.success("Login successful!");
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Invalid email or password");
@@ -55,7 +72,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-md w-full space-y-8 text-gray-600">
         {/* Header */}
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">

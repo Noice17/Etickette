@@ -81,94 +81,10 @@ export default function Home() {
         const data = await res.json();
         setUser(data);
       } catch (error) {
-        toast.error("Error fetching user");
         console.error("Error fetching user:", error);
         router.replace("/login");
       }
     };
-
-    // const fetchTickets = async () => {
-    //   try {
-    //     const res = await apiFetch("/tickets/all");
-    //     if (!res.ok) {
-    //       throw new Error("Failed to fetch tickets");
-    //     }
-    //     const data: Ticket[] = await res.json();
-    //     setTickets(data);
-
-    //     const resolvedTickets = data.filter(
-    //       (ticket: Ticket) => ticket.resolvedAt !== null
-    //     );
-
-    //     const totalResolutionTime = resolvedTickets.reduce(
-    //       (acc: number, ticket: Ticket) => {
-    //         const createdAt = new Date(ticket.createdAt).getTime();
-    //         const resolvedAt = new Date(ticket.resolvedAt!).getTime();
-    //         return acc + (resolvedAt - createdAt);
-    //       },
-    //       0
-    //     );
-    //     const avgTime =
-    //       resolvedTickets.length > 0
-    //         ? totalResolutionTime / resolvedTickets.length
-    //         : 0;
-
-    //     // Format: convert milliseconds to hours + minutes
-    //     const avgHours = Math.floor(avgTime / (1000 * 60 * 60));
-    //     const avgMinutes = Math.floor(
-    //       (avgTime % (1000 * 60 * 60)) / (1000 * 60)
-    //     );
-    //     const formatted = `${avgHours} hr ${avgMinutes} min`;
-    //     setAvgResolutionTime(formatted);
-
-    //     //Resolved vs Unresolved by Priority
-    //     const priorityLevels = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
-    //     const priorityCounts = priorityLevels.map((priority) => {
-    //       const ticketsByPriority = data.filter((t) => t.priority === priority);
-    //       const resolved = ticketsByPriority.filter(
-    //         (t) => t.resolvedAt !== null
-    //       ).length;
-    //       const unresolved = ticketsByPriority.length - resolved;
-
-    //       return {
-    //         priority,
-    //         resolved,
-    //         unresolved,
-    //       };
-    //     });
-    //     setPriorityData(priorityCounts);
-    //   } catch (error) {
-    //     toast.error("Error fetching tickets");
-    //     console.error("Error fetching tickets:", error);
-    //   }
-    // };
-
-    // const fetchAgents = async () => {
-    //   try {
-    //     const res = await apiFetch("/agents");
-    //     if (!res.ok) {
-    //       throw new Error("Failed to fetch agents");
-    //     }
-    //     const data: Agent[] = await res.json();
-    //     setAgents(data);
-
-    //     const ratedAgents = data.filter((agent) => agent.averageRating > 0);
-
-    //     if (ratedAgents.length > 0) {
-    //       const totalRatings = data.reduce(
-    //         (sum, agent) => sum + agent.averageRating,
-    //         0
-    //       );
-    //       const avgRating = totalRatings / ratedAgents.length;
-    //       setAvgRating(parseFloat(avgRating.toFixed(1)));
-    //     } else {
-    //       setAvgRating(0);
-    //     }
-    //   } catch (error) {
-    //     toast.error("Error fetching agents");
-    //     console.error("Error fetching agents:", error);
-    //   }
-    // };
 
     const fetchData = async () => {
       try {
@@ -237,14 +153,12 @@ export default function Home() {
           setAvgRating(0);
         }
       } catch (error) {
-        toast.error("Error fetching dashboard data");
+        console.error("Error fetching dashboard data", error);
       }
     };
 
     fetchUser();
     fetchData();
-    // fetchTickets();
-    // fetchAgents();
   }, []);
 
   return (

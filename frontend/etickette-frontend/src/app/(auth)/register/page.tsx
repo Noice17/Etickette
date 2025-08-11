@@ -2,26 +2,66 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
+import { apiFetch } from "@/utils/apiFetch";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
+    role: "CLIENT"
   });
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleRegister = () => {
-    // Simple redirect to main page without any registration logic
-    router.push("/login");
+  const handleRegister = async () => {
+    if (!formData.username || !formData.email || !formData.password) {
+      toast.error("Please fill out all fields");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await apiFetch(
+        "/auth/register",
+        {
+          method: "POST",
+          body: JSON.stringify(formData),
+        },
+        false
+      );
+
+      if (!res.ok) {
+        let errorMessage = "Registration failed";
+
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorMessage;
+        } else {
+          errorMessage = await res.text(); // plain text fallback
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      toast.success("Account created successfully! Please log in.");
+      router.push("/login");
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -29,7 +69,9 @@ export default function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            Create Account
+          </h2>
           <p className="text-gray-600">Join the Etickette ticketing system</p>
         </div>
 
@@ -38,7 +80,10 @@ export default function RegisterPage() {
           <div className="space-y-6">
             {/* Username Field */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Username
               </label>
               <input
@@ -54,7 +99,10 @@ export default function RegisterPage() {
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Email address
               </label>
               <input
@@ -70,7 +118,10 @@ export default function RegisterPage() {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Password
               </label>
               <input
@@ -98,7 +149,10 @@ export default function RegisterPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
-              <Link href="/login" className="text-indigo-500 hover:text-indigo-300 font-medium hover:underline">
+              <Link
+                href="/login"
+                className="text-indigo-500 hover:text-indigo-300 font-medium hover:underline"
+              >
                 Login
               </Link>
             </p>

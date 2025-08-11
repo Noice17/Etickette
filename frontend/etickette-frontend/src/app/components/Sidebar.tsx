@@ -22,13 +22,14 @@ export default function Sidebar({ collapsed, toggleCollapsed }: Props) {
   const router = useRouter();
 
   const handleLogout = () => {
+    router.push("/login");
     // Clear localStorage
     localStorage.removeItem("token");
-    toast.success("Logout Successful!");
     document.cookie = "token=; Max-Age=0; path=/"; // clear cookie if you're using one
 
     // Redirect to login
-    router.push("/login");
+    toast.success("Logout Successful!");
+    
   };
 
   return (
