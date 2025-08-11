@@ -1,103 +1,167 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { register, login } from "./api";
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+export default function LandingPage() {
+    const router = useRouter();
+    const [isRegister, setIsRegister] = useState(false);
+
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+        username: "",
+        role: "CLIENT",
+    });
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        try {
+            const result = isRegister
+                ? await register(formData)
+                : await login(formData);
+
+            console.log("Success:", result);
+
+            if (!isRegister) {
+                const role = localStorage.getItem("role");
+
+                switch (role?.toUpperCase()) {
+                    case 'CLIENT':
+                        router.push('/Webpages/client');
+                        break;
+                    case 'AGENT':
+                        router.push('/Webpages/agent');
+                        break;
+                    default:
+                        console.error('Unknown or missing role:', role);
+                        break;
+                }
+            }else{
+                alert("Account created successfully. You can now log in.");
+                setIsRegister(false);
+            }
+        } catch (err: any) {
+            alert(err.message || "Something went wrong");
+        }
+    };
+
+    return (
+        <div className="w-full h-screen bg-bg-og-bg-of-mc flex items-center justify-center font-montserrat relative overflow-hidden">
+            {/* Main Card with Fixed Height */}
+            <div className="w-full max-w-md mx-auto h-5/6 bg-white/90 backdrop-blur-lg border border-border-blue rounded-3xl shadow-xl flex flex-col">
+                
+                {/* Scrollable Content Area */}
+                <div className="flex-1 overflow-y-auto p-8">
+                    <div className="text-center mb-6 mt-8">
+                        <h1 className="text-3xl font-bold text-blue-active">
+                            {isRegister ? "Create Account" : "Welcome Back"}
+                        </h1>
+                        <p className="text-gray-category mt-1.5">
+                            {isRegister ? "Join our happy team!" : "We are here to gracefully resolve your concerns"}
+                        </p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {isRegister && (
+                            <>
+                                <div>
+                                    <label htmlFor="username" className="block text-sm font-medium mb-1 text-darkIndigo">
+                                        Username
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        id="username"
+                                        value={formData.username}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="w-full px-4 py-3 border border-border-blue rounded-xl focus:outline-none focus:ring-2 focus:ring-activeBlue/50 focus:border-activeBlue transition-all duration-200 placeholder-gray-400"
+                                        placeholder="Enter your name"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 text-darkIndigo">Role</label>
+                                    <div className="flex gap-2">
+                                        {["CLIENT", "AGENT"].map((role) => (
+                                            <button
+                                                key={role}
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, role })}
+                                                className={`flex-1 py-2 px-4 rounded-xl text-sm font-medium transition-all duration-200 capitalize
+                                                    ${formData.role === role
+                                                        ? "bg-blue-buttons text-white shadow-md"
+                                                        : "bg-lightBabyBlue text-darkIndigo hover:bg-deepBabyBlue/30"
+                                                    }`}
+                                            >
+                                                {role.toLowerCase()}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium mb-1 text-darkIndigo">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                required
+                                className="w-full px-4 py-3 border border-border-blue rounded-xl focus:outline-none focus:ring-2 focus:ring-activeBlue/50 focus:border-activeBlue transition-all duration-200 placeholder-gray-400"
+                                placeholder="you@example.com"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium mb-1 text-darkIndigo">
+                                Password
+                            </label>
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                required
+                                className="w-full px-4 py-3 border border-border-blue rounded-xl focus:outline-none focus:ring-2 focus:ring-activeBlue/50 focus:border-activeBlue transition-all duration-200 placeholder-gray-400"
+                                placeholder="••••••••"
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="w-full py-3 bg-blue-buttons text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:bg-white hover:text-blue-buttons transform transition-all duration-200"
+                        >
+                            {isRegister ? "Sign Up" : "Log In"}
+                        </button>
+                    </form>
+
+                    <div className="mt-6 text-center">
+                        <p className="text-darkIndigo/80">
+                            {isRegister ? "Already have an account?" : "Don't have an account?"}
+                        </p>
+                        <button
+                            onClick={() => setIsRegister(!isRegister)}
+                            className="text-blue-buttons font-medium underline hover:text-darkActiveBlue transition-colors duration-200"
+                        >
+                            {isRegister ? "Log In" : "Sign Up"}
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
 }
