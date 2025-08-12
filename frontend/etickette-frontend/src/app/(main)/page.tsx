@@ -68,6 +68,7 @@ export default function Home() {
     const token = localStorage.getItem("token");
     if (!token) {
       router.replace("/login");
+      return; // Stop further execution
     }
 
     const fetchUser = async () => {
@@ -75,13 +76,20 @@ export default function Home() {
         const res = await apiFetch("/users/me");
 
         if (!res.ok) {
-          throw new Error("Failed to fetch current user");
+          throw new Error("Invalid or expired token");
         }
 
         const data = await res.json();
+        if (data.role !== "ADMIN") {
+          console.warn("Access denied: User is not an ADMIN");
+          localStorage.removeItem("token");
+          router.replace("/login");
+          return; // Stop execution
+        }
         setUser(data);
       } catch (error) {
         console.error("Error fetching user:", error);
+        localStorage.removeItem("token"); // Clear bad token
         router.replace("/login");
       }
     };
@@ -159,7 +167,7 @@ export default function Home() {
 
     fetchUser();
     fetchData();
-  }, []);
+  }, [router]);
 
   return (
     <div className="p-6 space-y-6">
@@ -266,7 +274,7 @@ export default function Home() {
         <PriorityTicketChart data={priorityData} />
 
         {/* Etickette Banner */}
-        <EticketteBanner/>
+        <EticketteBanner />
       </div>
     </div>
   );
