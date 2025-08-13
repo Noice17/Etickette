@@ -59,7 +59,7 @@ export default function LoginPage() {
       }else if (user.role === "AGENT"){
         router.push("/pages/agent")
       }else{
-        router.push("/");
+        router.push("/pages/admin");
       }
 
       // router.push("/");

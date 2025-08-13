@@ -7,6 +7,7 @@ import TicketKanbanView from "@/app/components/all-tickets/TicketKanbanView";
 import TicketListView from "@/app/components/all-tickets/TicketListView";
 import { apiFetch } from "@/utils/apiFetch";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 // Define types
 interface Agent {
@@ -26,6 +27,7 @@ interface Ticket {
 }
 
 export default function AllTickets() {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState("table");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [agentFilter, setAgentFilter] = useState("all");
@@ -35,6 +37,12 @@ export default function AllTickets() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      localStorage.clear();
+      router.replace("/login");
+    }
+
     const fetchTickets = async () => {
       try {
         const res = await apiFetch("/tickets/all");

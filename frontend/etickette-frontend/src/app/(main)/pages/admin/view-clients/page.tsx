@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "@/utils/apiFetch";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface Client {
   id: string;
@@ -22,12 +23,19 @@ interface Client {
 }
 
 export default function ViewClients() {
+  const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortField, setSortField] = useState<keyof Client>("id");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      localStorage.clear();
+      router.replace("/login");
+    }
+    
     const fetchClients = async () => {
       try {
         setLoading(true)

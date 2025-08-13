@@ -22,14 +22,15 @@ export default function Sidebar({ collapsed, toggleCollapsed }: Props) {
   const router = useRouter();
 
   const handleLogout = () => {
-    router.push("/login");
-    // Clear localStorage
-    localStorage.removeItem("token");
-    document.cookie = "token=; Max-Age=0; path=/"; // clear cookie if you're using one
+    // Clear all local storage data
+    localStorage.clear();
+
+    // Clear cookies (basic clear for 'token', extend if needed)
+    document.cookie = "token=; Max-Age=0; path=/";
 
     // Redirect to login
+    router.push("/login");
     toast.success("Logout Successful!");
-    
   };
 
   return (
@@ -47,7 +48,7 @@ export default function Sidebar({ collapsed, toggleCollapsed }: Props) {
         </div>
 
         <nav className="flex flex-col gap-4">
-          <Link href="/">
+          <Link href="/pages/admin">
             <div className="flex items-center gap-2 px-5 py-3 hover:bg-indigo-700 rounded">
               <LayoutDashboard />
               {!collapsed && <span>Dashboard</span>}

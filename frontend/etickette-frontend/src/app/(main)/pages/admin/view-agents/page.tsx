@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { apiFetch } from "@/utils/apiFetch";
+import { useRouter } from "next/navigation";
 
 interface Agent {
   userId: number;
@@ -25,12 +26,19 @@ interface Agent {
 }
 
 export default function ViewAgents() {
+  const router = useRouter();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortField, setSortField] = useState<keyof Agent>("userId");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      localStorage.clear();
+      router.replace("/login");
+    }
+
     const fetchAgentsAndTickets = async () => {
       try {
         const [agentsRes, ticketsRes] = await Promise.all([
